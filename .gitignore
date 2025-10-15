@@ -160,3 +160,12 @@ Desktop.ini
 # Temporary files
 *.tmp
 *.temp
+
+# AWS Credentials and Keys
+*.pem
+*.pkk
+.aws/
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars

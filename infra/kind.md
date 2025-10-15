@@ -1,6 +1,6 @@
 
 ```shell
-$ kind create cluster --name cicd001 --config kind-config.yaml
+$ kind create cluster --name my-kind --config kind-config.yaml
 $ kubectl get nodes
 
 NAME                    STATUS   ROLES           AGE    VERSION

@@ -4,70 +4,152 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a CI/CD demonstration project for a simple ticket management system with modern microservices architecture (Java Spring Boot backend + Vue 3 frontend). The project is designed to showcase CI/CD pipelines using DevOps tools and practices.
+This is a **Ticket Management System CI/CD demonstration project** showcasing modern DevOps practices with a microservices architecture (Spring Boot backend + Vue 3 frontend). The project demonstrates a complete pipeline from development to production deployment using infrastructure as code, containerization, and GitOps.
 
-## Architecture
+## Architecture & Technology Stack
 
-- **Backend**: Spring Boot 3.5.6 with Java 17, Maven build system, runs on port 8080
-- **Frontend**: Vue 3 with Composition API, TypeScript, Vite build tool, pnpm package manager
-- **No database**: Uses in-memory storage for simplicity
-- **CI/CD**: GitHub Actions → Docker → Kubernetes → Helm → ArgoCD pipeline
+### Backend (Spring Boot)
+- **Framework**: Spring Boot 3.5.6 with Java 17
+- **Build Tool**: Maven
+- **Port**: 8080
+- **Structure**: RESTful API with full CRUD operations
+- **Key Components**:
+  - `TicketController.java` - REST API endpoints with CORS support for localhost:5173, localhost:3000
+  - `TicketService.java` - Business logic layer
+  - `Ticket.java` - Entity model with status management (OPEN, IN_PROGRESS, COMPLETED)
+  - `TicketDto.java` - Data transfer objects
+  - `CreateTicketRequest.java` - Request DTOs for ticket creation
+
+### Frontend (Vue 3)
+- **Framework**: Vue 3 with Composition API and TypeScript
+- **Build Tool**: Vite 7.1.7
+- **Package Manager**: pnpm
+- **Port**: 5173 (development), 80 (production)
+- **Key Components**:
+  - `App.vue` - Main application layout
+  - `TicketList.vue` - Ticket management interface
+  - `TicketForm.vue` - Ticket creation/editing form
 
 ## Development Commands
-
-### Frontend (Vue 3 + TypeScript)
-```bash
-cd frontend
-pnpm install          # Install dependencies
-pnpm dev             # Start development server (typically port 5173)
-pnpm build           # Build for production
-pnpm preview         # Preview production build
-```
 
 ### Backend (Spring Boot)
 ```bash
 cd backend
-mvn clean install    # Build and run tests
-mvn spring-boot:run  # Run application (port 8080)
-mvn test            # Run tests only
+mvn clean install            # Build and run tests
+mvn spring-boot:run          # Run application (port 8080)
+mvn test                     # Run tests only
+mvn clean package -DskipTests # Build without tests
 ```
 
-## Project Structure
-
-```
-play-cicd001/
-├── backend/                    # Spring Boot API
-│   ├── src/main/java/net/billcat/demo/backend/
-│   ├── src/main/resources/
-│   └── pom.xml
-├── frontend/                   # Vue 3 SPA
-│   ├── src/components/
-│   ├── src/App.vue
-│   └── package.json
-└── README.md                   # Project requirements (Chinese)
+### Frontend (Vue 3 + TypeScript)
+```bash
+cd frontend
+pnpm install                 # Install dependencies
+pnpm dev                     # Start development server (port 5173)
+pnpm build                   # Build for production
+pnpm preview                 # Preview production build
 ```
 
-## Key Technologies & Configurations
+### Docker Containerization
+```bash
+# Build images
+docker build -f cicd/docker/backend/Dockerfile -t ticket-backend ./backend
+docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
 
-- **Backend Framework**: Spring Boot 3.x with Java 17
-- **Frontend Framework**: Vue 3 with Composition API and TypeScript
-- **Build Tools**: Maven (backend), Vite (frontend)
-- **Package Manager**: pnpm (frontend)
-- **Testing**: JUnit 5 (backend), Vitest/Vue Test Utils (frontend)
-- **CI/CD Stack**: GitHub Actions, Docker, Kubernetes, Helm, ArgoCD
+# Images use multi-stage builds with security-focused non-root users
+# Backend includes health checks via curl to /api/tickets
+```
 
-## Development Notes
+## CI/CD Pipeline
 
-- Both frontend and backend projects are scaffolded but core functionality (ticket CRUD) needs implementation
-- The project includes IDE configurations in `.idea/` directory
-- All dependencies and basic project structure are already configured
-- Focus should be on implementing ticket management features and CI/CD pipeline components
+### GitHub Actions Workflows
+- **CI Pipeline** (`cicd/github-actions/ci.yml`):
+  - Triggers on push to main/develop and PRs to main
+  - Tests and builds both backend (Maven) and frontend (pnpm)
+  - Builds and pushes Docker images on main branch merges
 
-## Implementation Roadmap
+- **CD Pipelines** (`cicd/github-actions/cd-dev.yml`, `cicd/github-actions/cd-prod.yml`):
+  - Separate deployment workflows for dev and prod environments
+  - Manual trigger for production deployment
 
-1. Implement ticket CRUD operations in both frontend and backend
-2. Create Dockerfiles for containerization
-3. Set up GitHub Actions workflows for CI/CD
-4. Create Kubernetes deployment manifests
-5. Configure Helm charts for package management
-6. Set up ArgoCD for GitOps deployment
+### Container Orchestration
+- **Kubernetes** (`cicd/k8s/`): Separate deployments for frontend/backend with service configurations
+- **Helm Charts** (`cicd/helm/`): Package management with environment-specific values
+- **ArgoCD** (`cicd/argocd/`): GitOps configuration for continuous deployment
+
+## Infrastructure as Code
+
+### Terraform EKS Setup (`/infra/`)
+- **Provider**: AWS
+- **Service**: EKS Kubernetes 1.28
+- **Compute**: 2x t3.medium worker nodes (auto-scaling 1-3)
+- **Network**: Custom VPC (10.0.0.0/16) with public/private subnets
+- **Region**: ap-southeast-1
+- **Estimated Cost**: ~$170/month
+
+### Infrastructure Commands
+```bash
+cd infra
+terraform init                                    # Initialize Terraform
+terraform plan                                    # Show execution plan
+terraform apply                                   # Deploy infrastructure
+aws eks --region ap-southeast-1 update-kubeconfig --name ticket-system-eks  # Configure kubectl
+terraform destroy                                 # Destroy all resources
+./cleanup-eks.sh                                  # Alternative cleanup script
+```
+
+## Key Configuration Details
+
+### CORS Configuration
+Backend configured for local development with origins:
+- `http://localhost:5173` (Vite dev server)
+- `http://localhost:3000` (alternative frontend port)
+
+### Health Checks
+- Backend: `/api/tickets` endpoint check via curl every 30 seconds
+- Docker: Health checks configured with 60-second start period
+
+### Security Features
+- Multi-stage Docker builds with minimal attack surface
+- Non-root container users (UID 1001)
+- Resource limits configured in Kubernetes deployments
+- Infrastructure tags for cost tracking and resource management
+
+### Cost Management
+All AWS resources are tagged with:
+- `Project`: ticket-management
+- `Environment`: dev
+- `ManagedBy`: terraform
+- `Owner`: PES-SongBai
+- `Purpose`: CI-CD-Demo
+
+## Testing
+
+### Backend Tests
+```bash
+cd backend && mvn test
+```
+- Uses JUnit 5 (spring-boot-starter-test)
+- Single test class: `BackendApplicationTests.java`
+
+### Frontend Tests
+```bash
+cd frontend && pnpm test
+```
+- Uses Vitest and Vue Test Utils
+- Test files should follow `*.test.ts` pattern
+
+## Development Workflow
+
+1. **Local Development**: Run backend on 8080, frontend on 5173
+2. **Testing**: Ensure all tests pass before committing
+3. **CI Pipeline**: Automatic on push to main/develop
+4. **Docker Images**: Built and pushed automatically on main branch
+5. **Deployment**: Use CD workflows or GitOps via ArgoCD
+
+## Important Notes
+
+- **No Database**: Uses in-memory storage for simplicity
+- **Resource Cleanup**: Use `./cleanup-eks.sh` when not using to avoid costs
+- **Bilingual Support**: Documentation available in Chinese and English
+- **Production Ready**: Includes monitoring, health checks, and security best practices
