@@ -1,0 +1,46 @@
+# Production values for ticket-system.
+
+replicaCount:
+  backend: 3
+  frontend: 3
+
+image:
+  backend:
+    repository: your-docker-username/ticket-backend
+    tag: "latest"
+  frontend:
+    repository: your-docker-username/ticket-frontend
+    tag: "latest"
+
+resources:
+  backend:
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  frontend:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
+ingress:
+  hosts:
+    - host: ticket.yourdomain.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: ticket-tls
+      hosts:
+        - ticket.yourdomain.com
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70

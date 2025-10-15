@@ -1,0 +1,37 @@
+name: CD to Development
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    name: Deploy to Development
+    environment: development
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v4
+      with:
+        version: 'v1.28.0'
+
+    - name: Configure kubectl
+      run: |
+        echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > kubeconfig
+        export KUBECONFIG=kubeconfig
+
+    - name: Deploy to Development
+      run: |
+        export KUBECONFIG=kubeconfig
+        kubectl apply -f cicd/k8s/namespace.yaml
+        kubectl apply -f cicd/k8s/backend/
+        kubectl apply -f cicd/k8s/frontend/
+
+    - name: Verify Deployment
+      run: |
+        export KUBECONFIG=kubeconfig
+        kubectl rollout status deployment/backend-deployment -n ticket-dev
+        kubectl rollout status deployment/frontend-deployment -n ticket-dev

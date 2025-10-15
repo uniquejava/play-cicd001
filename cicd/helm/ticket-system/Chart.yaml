@@ -1,0 +1,15 @@
+apiVersion: v2
+name: ticket-system
+description: A Helm chart for Ticket Management System
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+keywords:
+  - ticket
+  - management
+  - ci-cd
+
+maintainers:
+  - name: Your Name
+    email: your.email@example.com

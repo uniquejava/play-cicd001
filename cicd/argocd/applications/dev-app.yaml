@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ticket-system-dev
+  namespace: argocd
+spec:
+  project: ticket-system
+  source:
+    repoURL: https://github.com/your-username/play-cicd001.git
+    targetRevision: develop
+    path: cicd/helm/ticket-system
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ticket-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+  retry:
+    limit: 5
+    backoff:
+      duration: 5s
+      factor: 2
+      maxDuration: 3m
