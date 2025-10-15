@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: your-docker-username/ticket-frontend:latest
+        image: ticket-frontend:latest
         ports:
         - containerPort: 80
         env:

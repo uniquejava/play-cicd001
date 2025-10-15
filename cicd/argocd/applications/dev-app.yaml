@@ -6,7 +6,7 @@ metadata:
 spec:
   project: ticket-system
   source:
-    repoURL: https://github.com/your-username/play-cicd001.git
+    repoURL: https://github.com/uniquejava/play-cicd001.git
     targetRevision: develop
     path: cicd/helm/ticket-system
   destination:

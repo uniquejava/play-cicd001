@@ -6,7 +6,7 @@ metadata:
 spec:
   description: Ticket Management System Project
   sourceRepos:
-  - repoURL: https://github.com/your-username/play-cicd001.git
+  - repoURL: https://github.com/uniquejava/play-cicd001.git
     targetRevision: HEAD
   destinations:
   - namespace: ticket-*

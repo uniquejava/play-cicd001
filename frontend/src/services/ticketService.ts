@@ -1,4 +1,4 @@
-import type { Ticket, CreateTicketRequest, ApiResponse } from '@/types/ticket'
+import type {CreateTicketRequest, Ticket} from '@/types/ticket'
 
 const API_BASE_URL = '/api/tickets'
 

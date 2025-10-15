@@ -17,8 +17,8 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 # 创建非root用户
-RUN addgroup --system --gid 1001 appuser && \
-    adduser --system --uid 1001 --gid 1001 appuser
+RUN addgroup -g 1001 appuser && \
+    adduser -D -u 1001 -G appuser appuser
 
 # 更改文件所有权
 RUN chown -R appuser:appuser /app
