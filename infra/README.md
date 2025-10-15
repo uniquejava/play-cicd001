@@ -4,7 +4,7 @@
 
 ## 🏗️ 架构概览
 
-- **EKS Cluster**: Kubernetes 1.28 控制平面
+- **EKS Cluster**: Kubernetes 1.32 控制平面
 - **VPC**: 10.0.0.0/16 网络段
 - **Subnets**:
   - 2个私有子网 (用于Worker Nodes)
@@ -77,7 +77,7 @@ kubectl get nodes
 ### 计算
 - **实例类型**: t3.medium (2 vCPU, 4GB RAM)
 - **节点数量**: 2个 (可扩展)
-- **Kubernetes版本**: 1.28
+- **Kubernetes版本**: 1.32
 
 ## 💰 成本估算
 

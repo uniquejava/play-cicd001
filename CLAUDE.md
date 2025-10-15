@@ -81,7 +81,7 @@ docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
 
 ### Terraform EKS Setup (`/infra/`)
 - **Provider**: AWS
-- **Service**: EKS Kubernetes 1.28
+- **Service**: EKS Kubernetes 1.32
 - **Compute**: 2x t3.medium worker nodes (auto-scaling 1-3)
 - **Network**: Custom VPC (10.0.0.0/16) with public/private subnets
 - **Region**: ap-southeast-1

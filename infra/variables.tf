@@ -19,7 +19,7 @@ variable "cluster_name" {
 variable "eks_version" {
   description = "EKS Kubernetes version"
   type        = string
-  default     = "1.28"
+  default     = "1.32"
 }
 
 variable "vpc_cidr" {
@@ -67,5 +67,29 @@ variable "min_size" {
 variable "ssh_key_name" {
   description = "SSH key name for EC2 instances"
   type        = string
-  default     = ""
+}
+
+variable "ecr_repositories" {
+  description = "List of ECR repository names"
+  type        = list(string)
+  default     = ["backend", "frontend"]
+}
+
+variable "project_name" {
+  description = "Project name for tagging"
+  type        = string
+  default     = "ticket-management"
+}
+
+variable "common_tags" {
+  description = "Common tags to apply to all resources"
+  type        = map(string)
+  default = {
+    Project     = "ticket-management"
+    Environment = "dev"
+    ManagedBy   = "terraform"
+    Owner       = "PES-SongBai"
+    CreatedAt   = "2025-10-15"
+    Purpose     = "CI-CD-Demo"
+  }
 }
