@@ -16,28 +16,19 @@ RUN pnpm install --frozen-lockfile
 # 复制源代码
 COPY . .
 
-# 构建应用
-RUN pnpm build
+# 构建应用 - 支持动态构建模式
+ARG MODE=production
+RUN pnpm run build -- --mode $MODE
 
-# 运行阶段 - 使用nginx提供静态文件
-FROM nginx:alpine
+# production stage
+FROM nginx:1.25.5-alpine-slim as production-stage
 
-# 复制构建产物到nginx目录
+RUN chmod -R g+rwx /var/cache/nginx /var/run /var/log/nginx
+RUN chown -R nginx:0 /usr/share/nginx/html && \
+    chmod -R g+rwX /usr/share/nginx/html
+
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# 复制nginx配置
-RUN echo 'server { \
-  listen 80; \
-  server_name localhost; \
-  root /usr/share/nginx/html; \
-  index index.html index.htm; \
-  location / { \
-    try_files $uri $uri/ /index.html; \
-  } \
-}' > /etc/nginx/conf.d/default.conf
-
-# 暴露端口
 EXPOSE 80
 
-# 启动nginx
 CMD ["nginx", "-g", "daemon off;"]

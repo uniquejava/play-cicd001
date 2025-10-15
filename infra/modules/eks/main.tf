@@ -128,6 +128,7 @@ resource "aws_security_group" "node_ssh" {
   )
 }
 
+
 # EKS Node Group
 resource "aws_eks_node_group" "workers" {
   cluster_name    = aws_eks_cluster.cluster.name

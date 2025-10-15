@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: ticket-frontend:latest
+        image: 488363440930.dkr.ecr.ap-southeast-1.amazonaws.com/ticket-management-frontend-dev:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80

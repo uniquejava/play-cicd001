@@ -51,6 +51,7 @@ module "ecr" {
   tags = var.common_tags
 }
 
+
 # Data sources for EKS cluster authentication
 # Note: These are conditional resources that will be created after the cluster exists
 data "aws_eks_cluster" "cluster" {

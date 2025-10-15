@@ -1,6 +1,6 @@
 import type {CreateTicketRequest, Ticket} from '@/types/ticket'
 
-const API_BASE_URL = '/api/tickets'
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || '/api'}/tickets`
 
 class TicketService {
   async getAllTickets(): Promise<Ticket[]> {
