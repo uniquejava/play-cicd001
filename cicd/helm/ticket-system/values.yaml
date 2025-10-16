@@ -52,7 +52,7 @@ securityContext: {}
 
 ingress:
   enabled: true
-  className: ""
+  className: nginx
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
