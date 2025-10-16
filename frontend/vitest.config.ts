@@ -6,5 +6,13 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    setupFiles: [],
+    include: ['src/**/__tests__/*'],
+    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
+  },
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
   },
 })
