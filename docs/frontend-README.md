@@ -1,81 +1,50 @@
-# Frontend Development Guide
+# 前端开发指南
 
 ## 技术栈
+- Vue 3 + TypeScript + Vite
+- pnpm包管理
+- 端口: 5173(开发), 80(生产)
 
-- **框架**: Vue 3 with Composition API
-- **语言**: TypeScript
-- **构建工具**: Vite 7.1.7
-- **包管理器**: pnpm
-- **端口**: 5173 (development), 80 (production)
+## 开发命令
+```bash
+cd frontend
+pnpm install          # 安装依赖
+pnpm dev              # 开发服务器(5173)
+pnpm build            # 生产构建
+pnpm test             # 运行测试
+pnpm preview          # 预览构建结果
+```
 
 ## 项目结构
-
 ```
 frontend/
 ├── src/
-│   ├── components/        # Vue组件
-│   ├── services/         # API服务
-│   ├── types/           # TypeScript类型定义
-│   ├── App.vue          # 主应用组件
-│   └── main.ts          # 应用入口
-├── public/              # 静态资源
-├── index.html           # HTML模板
-├── package.json         # 项目配置
-├── tsconfig.json        # TypeScript配置
-├── vite.config.ts       # Vite配置
-└── pnpm-lock.yaml       # 依赖锁定文件
+│   ├── components/    # Vue组件
+│   ├── services/      # API服务
+│   ├── App.vue        # 主组件
+│   └── main.ts        # 入口文件
+├── package.json       # 配置文件
+└── vite.config.ts     # Vite配置
 ```
 
-## 开发命令
+## 主要组件
+- `App.vue` - 应用主布局
+- `TicketList.vue` - 工单列表
+- `TicketForm.vue` - 工单表单
 
+## API集成
+```typescript
+// 服务调用示例
+import { ticketService } from './services/ticketService'
+
+const tickets = await ticketService.getTickets()
+```
+
+## 构建部署
 ```bash
-# 安装依赖
-pnpm install
+# 构建Docker镜像
+docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
 
-# 启动开发服务器
-pnpm dev
-
-# 构建生产版本
-pnpm build
-
-# 预览生产构建
-pnpm preview
-
-# 运行测试
-pnpm test
+# CI/CD自动构建并推送到ECR
+# ECR地址: 488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-frontend-dev
 ```
-
-## 开发规范
-
-### 组件命名
-- 使用PascalCase命名组件
-- 文件名与组件名保持一致
-
-### API服务
-- 所有API调用放在 `src/services/` 目录
-- 使用TypeScript定义接口类型
-- 统一的错误处理
-
-### 状态管理
-- 使用Vue 3 Composition API
-- 组件间通信使用props和emits
-
-## 样式规范
-
-- 使用CSS模块化
-- 遵循BEM命名约定
-- 响应式设计
-
-## 部署
-
-前端应用部署在Kubernetes中，通过NGINX Ingress Controller提供服务。
-
-- **开发环境**: http://localhost:5173
-- **生产环境**: 通过负载均衡器访问
-
----
-
-**相关链接**:
-- [Vue 3 官方文档](https://vuejs.org/)
-- [Vite 官方文档](https://vitejs.dev/)
-- [TypeScript 手册](https://www.typescriptlang.org/docs/)

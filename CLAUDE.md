@@ -15,12 +15,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ├── frontend/                   # Vue 3 frontend application
 ├── scripts/                    # Deployment and utility scripts
 │   ├── deploy.sh              # Main deployment script (infrastructure + apps)
+│   ├── setup-ecr-credentials.sh # ECR credentials automation script
 │   └── docker/                # Docker build scripts
 ├── cicd/                       # CI/CD configurations
 │   ├── k8s/                   # Kubernetes manifests (Kustomize)
 │   │   ├── kustomization.yaml # Kustomize configuration
 │   │   ├── backend/           # Backend deployment & service
 │   │   ├── frontend/          # Frontend deployment & service
+│   │   ├── argocd/            # ArgoCD-specific configurations
+│   │   │   ├── ecr-credentials.yaml # ECR credentials for Image Updater
+│   │   │   └── kustomization.yaml    # ArgoCD kustomization
+│   │   ├── secrets/           # Secret templates
 │   │   ├── ingress.yaml       # Ingress configuration
 │   │   └── namespace.yaml     # Namespace definition
 │   ├── argocd/                # ArgoCD GitOps configurations
@@ -160,6 +165,11 @@ argocd app list                          # List all applications
 # Image Updater
 kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-image-updater
 kubectl logs -n argocd deployment/argocd-image-updater
+
+# ECR Credentials Management
+./scripts/setup-ecr-credentials.sh           # Generate/update ECR credentials
+kubectl apply -f cicd/k8s/argocd/ecr-credentials.yaml  # Apply credentials
+kubectl apply -k cicd/k8s/argocd/             # Apply using kustomize
 ```
 
 ### Kubernetes Management

@@ -11,7 +11,6 @@ resources:
   - backend/
   - frontend/
   - ingress.yaml
-  - ingress-class.yaml
 
 images:
   - name: 488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-backend-dev

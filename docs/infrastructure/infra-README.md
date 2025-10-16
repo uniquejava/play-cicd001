@@ -1,140 +1,54 @@
-# EKS Infrastructure with Terraform
+# EKS基础设施
 
-这个Terraform配置用于在AWS上创建一个完整的EKS集群，用于部署Ticket Management System。
+## 架构
+- **EKS Cluster**: Kubernetes 1.32
+- **VPC**: 10.0.0.0/16 (2私有子网 + 2公有子网)
+- **Worker Nodes**: 2x t3.medium (可扩展1-3个)
+- **网络**: NAT Gateway + Internet Gateway
 
-## 🏗️ 架构概览
-
-- **EKS Cluster**: Kubernetes 1.32 控制平面
-- **VPC**: 10.0.0.0/16 网络段
-- **Subnets**:
-  - 2个私有子网 (用于Worker Nodes)
-  - 2个公有子网 (用于Load Balancers)
-- **Worker Nodes**: 2个 t3.medium 实例 (可扩展1-3个)
-- **Networking**: NAT Gateway + Internet Gateway
-- **Security**: SSH访问配置
-
-## 📋 前置要求
-
-1. **AWS CLI**: 已安装并配置
-2. **Terraform**: v1.0+
-3. **kubectl**: 已安装
-4. **AWS权限**:
-   - EKS Full Access
-   - VPC Full Access
-   - EC2 Full Access
-   - IAM Full Access
-
-## 🚀 部署步骤
-
-### 1. 初始化Terraform
+## 部署命令
 ```bash
 cd infra
 terraform init
-```
-
-### 2. 配置变量
-```bash
-# 复制并编辑配置文件
-cp terraform.tfvars.example terraform.tfvars
-
-# 编辑配置 (根据需要修改)
-# 确保SSH密钥存在: ssh_key_name = "your-ssh-key-name"
-```
-
-### 3. 执行部署
-```bash
-# 查看执行计划
 terraform plan
-
-# 应用配置
-terraform apply
-
-# 输入yes确认
+terraform apply  # 输入yes确认
 ```
 
-### 4. 配置kubectl
+## 配置kubectl
 ```bash
-# 更新kubeconfig
-aws eks --region ap-northeast-1 update-kubeconfig --name ticket-system-eks
-
-# 验证连接
+aws eks --region ap-northeast-1 update-kubeconfig --name tix-eks-fresh-magpie
 kubectl get nodes
 ```
 
-## 📊 资源说明
+## 成本估算
+- **总计**: ~$170/月
+- EKS控制平面: ~$73
+- EC2实例 (2x t3.medium): ~$60
+- NAT网关: ~$35
 
-### 主要组件
-- **EKS Cluster**: 管理的Kubernetes控制平面
-- **EKS Node Group**: Worker节点组
-- **VPC**: 网络隔离
-- **IAM Roles**: 服务角色和权限
-
-### 网络
-- **VPC CIDR**: 10.0.0.0/16
-- **私有子网**: 10.0.1.0/24, 10.0.2.0/24
-- **公有子网**: 10.0.101.0/24, 10.0.102.0/24
-
-### 计算
-- **实例类型**: t3.medium (2 vCPU, 4GB RAM)
-- **节点数量**: 2个 (可扩展)
-- **Kubernetes版本**: 1.32
-
-## 💰 成本估算
-
-**月度成本估算 (ap-northeast-1)**:
-- EKS控制平面: ~$0.10/hour = ~$73/month
-- 2x t3.medium: ~$0.0416/hour = ~$60/month
-- NAT Gateway: ~$0.045/hour + 数据传输 = ~$35/month
-- EIP: ~$3.65/month
-- **总计**: ~$170/month
-
-## 🛠️ 管理和维护
-
-### 查看集群状态
+## 管理命令
 ```bash
+# 查看集群状态
 kubectl cluster-info
 kubectl get nodes -o wide
-kubectl get pods --all-namespaces
-```
 
-### 扩展节点
-```bash
-# 修改 terraform.tfvars 中的 desired_size
+# 扩展节点 (修改terraform.tfvars后)
 terraform apply
-```
 
-### 删除集群
-```bash
+# 删除集群
 terraform destroy
 ```
 
-## 🔍 故障排除
-
-### 常见问题
-
-1. **权限错误**: 确保AWS用户有足够的权限
-2. **SSH密钥**: 确保指定的SSH密钥对存在
-3. **VPC限制**: 检查区域VPC配额
-4. **实例类型**: 确保选择的实例类型在区域可用
-
-### 日志查看
+## 清理资源
 ```bash
-# 查看Terraform日志
-terraform console
-
-# 查看AWS CloudWatch日志
-aws logs describe-log-groups --log-group-name-prefix /aws/eks
+# 删除所有AWS资源
+./cleanup-eks.sh
+# 或
+cd infra && terraform destroy
 ```
 
-## 📝 下一步
-
-集群创建后，可以继续以下步骤：
-1. 构建和推送Docker镜像到ECR
-2. 部署应用到EKS
-3. 安装ArgoCD进行GitOps
-4. 配置Ingress和Load Balancer
-5. 设置监控和日志
-
----
-
-*注意: 请确保在生产环境中适当调整安全组和网络配置。*
+## 下一步
+基础设施部署完成后：
+1. 部署应用到K8s: `./scripts/deploy.sh --skip-infra`
+2. 配置ArgoCD Image Updater
+3. 设置CI/CD自动部署流程
