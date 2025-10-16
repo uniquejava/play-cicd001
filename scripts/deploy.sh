@@ -179,9 +179,43 @@ create_namespace() {
     print_success "命名空间创建完成"
 }
 
+# 构建和推送Docker镜像
+build_and_push_images() {
+    print_step "4" "构建和推送Docker镜像"
+
+    cd "$PROJECT_ROOT"
+
+    # 获取AWS账户ID和ECR登录
+    local account_id=$(aws sts get-caller-identity --query Account --output text)
+    local ecr_registry="${account_id}.dkr.ecr.${REGION}.amazonaws.com"
+
+    print_info "登录ECR..."
+    aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$ecr_registry"
+
+    # 构建后端镜像
+    print_info "构建后端Docker镜像..."
+    docker build -f cicd/docker/backend/Dockerfile -t ticket-backend ./backend
+    docker tag ticket-backend:latest "${ecr_registry}/ticket-management-backend-dev:latest"
+
+    # 构建前端镜像
+    print_info "构建前端Docker镜像..."
+    docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
+    docker tag ticket-frontend:latest "${ecr_registry}/ticket-management-frontend-dev:latest"
+
+    # 推送后端镜像
+    print_info "推送后端镜像到ECR..."
+    docker push "${ecr_registry}/ticket-management-backend-dev:latest"
+
+    # 推送前端镜像
+    print_info "推送前端镜像到ECR..."
+    docker push "${ecr_registry}/ticket-management-frontend-dev:latest"
+
+    print_success "Docker镜像构建和推送完成"
+}
+
 # 部署应用
 deploy_applications() {
-    print_step "4" "部署应用"
+    print_step "5" "部署应用"
 
     cd "$K8S_DIR"
 
@@ -197,7 +231,7 @@ deploy_applications() {
 
     # 部署Ingress
     print_info "部署Ingress配置..."
-    kubectl apply -f ingress-class.yaml
+    #kubectl apply -f ingress-class.yaml
     kubectl apply -f ingress.yaml
 
     print_success "应用部署完成"
@@ -205,7 +239,7 @@ deploy_applications() {
 
 # 等待部署完成
 wait_for_deployment() {
-    print_step "5" "等待部署完成"
+    print_step "6" "等待部署完成"
 
     print_info "等待Pod启动..."
     kubectl wait --for=condition=available --timeout=300s deployment/backend-deployment -n "$NAMESPACE"
@@ -219,7 +253,7 @@ wait_for_deployment() {
 
 # 显示部署结果
 show_results() {
-    print_step "6" "显示部署结果"
+    print_step "7" "显示部署结果"
 
     echo ""
     print_info "=== 部署状态 ==="
@@ -313,6 +347,7 @@ main() {
 
     if [[ "$skip_apps" == false ]]; then
         create_namespace
+        build_and_push_images
         deploy_applications
         wait_for_deployment
     fi

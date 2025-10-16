@@ -67,7 +67,7 @@ docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
   - Triggers on push to main/develop and PRs to main
   - Tests and builds both backend (Maven) and frontend (pnpm)
   - Builds and pushes Docker images on main branch merges
-  - **ECR Registry**: `488363440930.dkr.ecr.ap-southeast-1.amazonaws.com`
+  - **ECR Registry**: `488363440930.dkr.ecr.ap-northeast-1.amazonaws.com`
   - **Image Names**:
     - Backend: `ticket-management-backend-dev`
     - Frontend: `ticket-management-frontend-dev`
@@ -106,7 +106,7 @@ kubectl logs -f deployment/frontend-deployment -n ticket-dev
 - **Service**: EKS Kubernetes 1.32
 - **Compute**: 2x t3.medium worker nodes (auto-scaling 1-3)
 - **Network**: Custom VPC (10.0.0.0/16) with public/private subnets
-- **Region**: ap-southeast-1
+- **Region**: ap-northeast-1
 - **Estimated Cost**: ~$170/month
 
 ### Infrastructure Commands
@@ -115,7 +115,7 @@ cd infra
 terraform init                                    # Initialize Terraform
 terraform plan                                    # Show execution plan
 terraform apply                                   # Deploy infrastructure
-aws eks --region ap-southeast-1 update-kubeconfig --name ticket-system-eks  # Configure kubectl
+aws eks --region ap-northeast-1 update-kubeconfig --name tix-eks-fresh-magpie  # Configure kubectl
 terraform destroy                                 # Destroy all resources
 ./cleanup-eks.sh                                  # Alternative cleanup script
 ```
@@ -187,3 +187,24 @@ cd frontend && pnpm test  # Currently no tests configured
 - **Resource Cleanup**: Use `./cleanup-eks.sh` when not using to avoid costs
 - **Bilingual Support**: Documentation available in Chinese and English
 - **Production Ready**: Includes monitoring, health checks, and security best practices
+
+## Network and Deployment Guidelines
+
+### Network Issues
+- If experiencing slow network or timeouts when executing local commands, use `emea2` or `emea` commands
+- These are aliases defined in `.zshrc` for setting HTTP proxy (try one if the other doesn't work)
+
+### Architecture Rules
+- This is a frontend-backend separated architecture
+- Set appropriate ingress rules:
+  - Access frontend via `http://domain`
+  - Access backend API via `http://domain/api`
+
+### AWS Resource Management
+- When rebuilding important AWS resources like EKS, ECS, always use a new cluster name to prevent AWS caching issues
+- Tag all AWS resources appropriately for easier maintenance
+- Don't delete the entire `.terraform` directory casually, only delete providers that need upgrading
+
+### Development Practices
+- Confirm current directory before executing search commands (find)
+- Avoid searching in subdirectories when not necessary

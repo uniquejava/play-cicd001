@@ -1,0 +1,16 @@
+我换了台电脑, 请执行deploy.sh,好像已经执行过了, 重复执行也没关系, 然后参考md文件(不知道是哪个)构建docker image, 推送到ecr, 最后根据k8s里的yaml部署他们,
+eks和ecr应该都创建好了, 如果碰到网络问题, 参考INSTRUCTION.md解决
+
+ESC
+
+请继续, 刚才应该碰到了网路问题,我在另外的terminal执行过tf init了
+
+ESC
+
+我发现在deploy.sh的第4步前少了构建docker image, push to ecr 的步骤, 先加上 然后部署!
+
+请使用deploy.sh里的deploy_ingress函数对应的方式安装ingress controller,最好不要修改,之前跑通过
+
+请根据当前aws resource 的状态重建本地的tf state, 确保tf plan 输出的 created/changed resource数均为0.
+
+目前的ecr有问题, 登录不了, 可以删除重建吗, 其他resource比如vpc和eks不要动

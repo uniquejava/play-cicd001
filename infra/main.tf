@@ -1,7 +1,5 @@
-# Generate unique cluster suffix
-resource "random_pet" "cluster_suffix" {
-  length = 2
-}
+# Fixed cluster name
+# Removed random_pet module to use consistent cluster name across deployments
 
 # VPC Module
 module "vpc" {
@@ -22,7 +20,7 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "19.21.0"
 
-  cluster_name    = "${var.cluster_name}-${random_pet.cluster_suffix.id}"
+  cluster_name    = "tix-eks-fresh-magpie"
   cluster_version = var.eks_version
 
   vpc_id          = module.vpc.vpc_id

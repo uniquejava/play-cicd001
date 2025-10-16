@@ -55,7 +55,7 @@ terraform apply
 ### 4. 配置kubectl
 ```bash
 # 更新kubeconfig
-aws eks --region ap-southeast-1 update-kubeconfig --name ticket-system-eks
+aws eks --region ap-northeast-1 update-kubeconfig --name ticket-system-eks
 
 # 验证连接
 kubectl get nodes
@@ -81,7 +81,7 @@ kubectl get nodes
 
 ## 💰 成本估算
 
-**月度成本估算 (ap-southeast-1)**:
+**月度成本估算 (ap-northeast-1)**:
 - EKS控制平面: ~$0.10/hour = ~$73/month
 - 2x t3.medium: ~$0.0416/hour = ~$60/month
 - NAT Gateway: ~$0.045/hour + 数据传输 = ~$35/month

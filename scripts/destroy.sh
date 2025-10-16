@@ -10,7 +10,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 # 环境配置
 NAMESPACE="ticket-dev"
 INGRESS_NAMESPACE="ingress-nginx"
-CLUSTER_NAME="ticket-system-eks"
+CLUSTER_NAME="tix-eks-fresh-magpie"
 REGION="ap-northeast-1"
 PROJECT_TAG="ticket-management"
 ENVIRONMENT_TAG="dev"

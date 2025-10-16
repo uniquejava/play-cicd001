@@ -12,8 +12,8 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  # Rule for custom domain (ticket-management.local)
-  - host: ticket-management.local
+  # Rule for custom domain (LoadBalancer address)
+  - host: ae61e6110ead2413e8e7d119b5b871f9-1708833654.ap-northeast-1.elb.amazonaws.com
     http:
       paths:
       # Backend API routes - /api/* goes to backend service

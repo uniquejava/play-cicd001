@@ -68,10 +68,10 @@ aws iam create-access-key --user-name cicd-github-actions
 ### ECR仓库地址
 ```bash
 # 后端
-488363440930.dkr.ecr.ap-southeast-1.amazonaws.com/ticket-management-backend-dev
+488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-backend-dev
 
 # 前端
-488363440930.dkr.ecr.ap-southeast-1.amazonaws.com/ticket-management-frontend-dev
+488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-frontend-dev
 ```
 
 ## 🔍 监控和调试

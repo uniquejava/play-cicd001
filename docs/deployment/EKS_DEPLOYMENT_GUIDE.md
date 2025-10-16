@@ -35,7 +35,7 @@ terraform apply
 
 #### 4. 配置kubectl
 ```bash
-aws eks --region ap-southeast-1 update-kubeconfig --name ticket-system-eks
+aws eks --region ap-northeast-1 update-kubeconfig --name tix-eks-fresh-magpie
 kubectl get nodes
 ```
 
@@ -73,10 +73,10 @@ terraform destroy
 ### 手动清理 (紧急情况)
 ```bash
 # 删除EKS集群
-aws eks delete-cluster --name ticket-system-eks --region ap-southeast-1
+aws eks delete-cluster --name tix-eks-fresh-magpie --region ap-northeast-1
 
 # 删除VPC和网络安全组
-aws ec2 delete-vpc --vpc-id <vpc-id> --region ap-southeast-1
+aws ec2 delete-vpc --vpc-id <vpc-id> --region ap-northeast-1
 ```
 
 ## 📋 资源标签
@@ -116,10 +116,10 @@ aws ec2 delete-vpc --vpc-id <vpc-id> --region ap-southeast-1
 terraform console
 
 # 查看EKS控制平面日志
-aws logs describe-log-groups --log-group-name-prefix /aws/eks --region ap-southeast-1
+aws logs describe-log-groups --log-group-name-prefix /aws/eks --region ap-northeast-1
 
 # 查看CloudFormation堆栈
-aws cloudformation list-stacks --region ap-southeast-1
+aws cloudformation list-stacks --region ap-northeast-1
 ```
 
 ## 📞 联系信息
