@@ -2,8 +2,8 @@
 
 一个基于Spring Boot + Vue 3的现代化工单管理系统，演示完整的DevOps和CI/CD流程。
 
-[![CI Status](https://github.com/your-username/play-cicd001/workflows/CI/badge.svg)](https://github.com/your-username/play-cicd001/actions)
-[![CD Status](https://github.com/your-username/play-cicd001/workflows/CD/badge.svg)](https://github.com/your-username/play-cicd001/actions)
+[![CI Pipeline](https://github.com/uniquejava/play-cicd001/actions/workflows/ci.yml/badge.svg)](https://github.com/uniquejava/play-cicd001/actions/workflows/ci.yml)
+
 
 ![screenshot](./docs/screenshot.jpg)
 
