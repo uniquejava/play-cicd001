@@ -8,11 +8,11 @@ replicaCount:
 
 image:
   backend:
-    repository: your-docker-username/ticket-backend
+    repository: 488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-backend-dev
     pullPolicy: IfNotPresent
     tag: "latest"
   frontend:
-    repository: your-docker-username/ticket-frontend
+    repository: 488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-frontend-dev
     pullPolicy: IfNotPresent
     tag: "latest"
 

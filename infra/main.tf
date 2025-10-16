@@ -1,3 +1,8 @@
+# Generate unique cluster suffix
+resource "random_pet" "cluster_suffix" {
+  length = 2
+}
+
 # VPC Module
 module "vpc" {
   source = "./modules/vpc"
@@ -12,25 +17,24 @@ module "vpc" {
   tags = var.common_tags
 }
 
-# EKS Module - 使用官方模块
+# EKS Module - 使用稳定版本
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "21.4.0"
+  version = "19.21.0"
 
-  cluster_name    = var.cluster_name
+  cluster_name    = "${var.cluster_name}-${random_pet.cluster_suffix.id}"
   cluster_version = var.eks_version
 
-  cluster_endpoint_public_access = true
+  vpc_id          = module.vpc.vpc_id
+  subnet_ids      = module.vpc.private_subnets
 
-  vpc_id                   = module.vpc.vpc_id
-  subnet_ids               = module.vpc.private_subnets
-  control_plane_subnet_ids = module.vpc.public_subnets
+  cluster_endpoint_public_access = true
 
   eks_managed_node_groups = {
     workers = {
       min_size       = 1
-      max_size       = 3
-      desired_size   = 2
+      max_size       = 2
+      desired_size   = 1
       instance_types = ["t3.medium"]
     }
   }
@@ -54,13 +58,3 @@ module "ecr" {
   tags = var.common_tags
 }
 
-# Data sources for EKS cluster authentication
-data "aws_eks_cluster" "cluster" {
-  name = module.eks.cluster_name
-  depends_on = [module.eks]
-}
-
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_name
-  depends_on = [module.eks]
-}

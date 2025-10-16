@@ -163,6 +163,7 @@ Desktop.ini
 
 # AWS Credentials and Keys
 *.pem
+*.pub
 *.pkk
 .aws/
 *.tfstate

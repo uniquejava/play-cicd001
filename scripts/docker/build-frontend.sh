@@ -20,7 +20,7 @@ if [[ "$MODE" != "production" && "$MODE" != "development" ]]; then
 fi
 
 # 设置镜像标签
-IMAGE_TAG="488363440930.dkr.ecr.ap-southeast-1.amazonaws.com/ticket-management-frontend-dev"
+IMAGE_TAG="488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-frontend-dev"
 if [[ "$MODE" == "development" ]]; then
     IMAGE_TAG="$IMAGE_TAG:dev"
 else

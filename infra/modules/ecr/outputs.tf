@@ -20,5 +20,5 @@ output "registry_id" {
 
 output "repository_registry_url" {
   description = "The URL of the registry"
-  value       = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com"
+  value       = "${data.aws_caller_identity.current.account_id}.dkr.ecr.ap-northeast-1.amazonaws.com"
 }

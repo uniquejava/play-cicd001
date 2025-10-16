@@ -67,6 +67,10 @@ docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
   - Triggers on push to main/develop and PRs to main
   - Tests and builds both backend (Maven) and frontend (pnpm)
   - Builds and pushes Docker images on main branch merges
+  - **ECR Registry**: `488363440930.dkr.ecr.ap-southeast-1.amazonaws.com`
+  - **Image Names**:
+    - Backend: `ticket-management-backend-dev`
+    - Frontend: `ticket-management-frontend-dev`
 
 - **CD Pipelines** (`cicd/github-actions/cd-dev.yml`, `cicd/github-actions/cd-prod.yml`):
   - Separate deployment workflows for dev and prod environments
@@ -76,6 +80,24 @@ docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
 - **Kubernetes** (`cicd/k8s/`): Separate deployments for frontend/backend with service configurations
 - **Helm Charts** (`cicd/helm/`): Package management with environment-specific values
 - **ArgoCD** (`cicd/argocd/`): GitOps configuration for continuous deployment
+
+### Kubernetes Management
+```bash
+# Namespace and deployment management
+kubectl create namespace ticket-dev --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -f cicd/k8s/backend/ -n ticket-dev
+kubectl apply -f cicd/k8s/frontend/ -n ticket-dev
+
+# Monitor deployments
+kubectl get pods -n ticket-dev
+kubectl get services -n ticket-dev
+kubectl get ingress -n ticket-dev
+kubectl logs -f deployment/backend-deployment -n ticket-dev
+kubectl logs -f deployment/frontend-deployment -n ticket-dev
+
+# Cleanup
+./scripts/k8s/cleanup-k8s.sh
+```
 
 ## Infrastructure as Code
 
@@ -96,6 +118,18 @@ terraform apply                                   # Deploy infrastructure
 aws eks --region ap-southeast-1 update-kubeconfig --name ticket-system-eks  # Configure kubectl
 terraform destroy                                 # Destroy all resources
 ./cleanup-eks.sh                                  # Alternative cleanup script
+```
+
+### Deployment Scripts
+```bash
+# One-click deployment (infrastructure + applications)
+./scripts/deploy.sh                               # Full deployment
+./scripts/deploy.sh --skip-infra                  # Deploy apps to existing cluster
+./scripts/deploy.sh --skip-apps                   # Deploy infrastructure only
+
+# Docker builds
+./scripts/docker/build-frontend.sh production     # Build frontend for production
+./scripts/docker/build-frontend.sh development    # Build frontend for development
 ```
 
 ## Key Configuration Details
@@ -134,10 +168,10 @@ cd backend && mvn test
 
 ### Frontend Tests
 ```bash
-cd frontend && pnpm test
+cd frontend && pnpm test  # Currently no tests configured
 ```
-- Uses Vitest and Vue Test Utils
-- Test files should follow `*.test.ts` pattern
+- Note: CI pipeline expects tests but none are currently implemented
+- Test framework not yet configured in package.json
 
 ## Development Workflow
 

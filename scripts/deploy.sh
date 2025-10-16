@@ -11,7 +11,7 @@ K8S_DIR="$PROJECT_ROOT/cicd/k8s"
 
 # 环境配置
 NAMESPACE="ticket-dev"
-CLUSTER_NAME="ticket-system-eks-final"
+CLUSTER_NAME="tix-eks-fresh-magpie"
 REGION="ap-northeast-1"
 
 # 颜色输出
@@ -128,9 +128,21 @@ deploy_infrastructure() {
 
     # 配置kubectl
     print_info "配置kubectl..."
-    aws eks --region "$REGION" update-kubeconfig --name "$CLUSTER_NAME"
 
-    print_success "kubectl配置完成"
+    # 如果跳过基础设施部署，检查当前kubectl上下文
+    if [[ "$skip_infra" == true ]]; then
+        local current_context=$(kubectl config current-context 2>/dev/null || echo "")
+        if [[ -n "$current_context" ]]; then
+            print_success "kubectl已配置到集群: $current_context"
+        else
+            print_error "kubectl未配置，无法连接到集群"
+            exit 1
+        fi
+    else
+        # 只有在部署基础设施时才更新kubeconfig
+        aws eks --region "$REGION" update-kubeconfig --name "$CLUSTER_NAME"
+        print_success "kubectl配置完成"
+    fi
 }
 
 # 部署NGINX Ingress Controller
@@ -147,7 +159,7 @@ deploy_ingress() {
     helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
         --namespace ingress-nginx \
         --create-namespace \
-        --set controller.replicaCount=2 \
+        --set controller.replicaCount=1 \
         --set controller.resources.requests.cpu=100m \
         --set controller.resources.requests.memory=128Mi \
         --set controller.resources.limits.cpu=500m \

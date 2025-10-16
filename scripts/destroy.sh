@@ -11,7 +11,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 NAMESPACE="ticket-dev"
 INGRESS_NAMESPACE="ingress-nginx"
 CLUSTER_NAME="ticket-system-eks"
-REGION="ap-southeast-1"
+REGION="ap-northeast-1"
 PROJECT_TAG="ticket-management"
 ENVIRONMENT_TAG="dev"
 

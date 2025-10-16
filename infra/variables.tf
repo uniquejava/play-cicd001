@@ -13,7 +13,7 @@ variable "environment" {
 variable "cluster_name" {
   description = "EKS cluster name"
   type        = string
-  default     = "ticket-system-eks-final"
+  default     = "tix-eks"
 }
 
 variable "eks_version" {
@@ -67,6 +67,7 @@ variable "min_size" {
 variable "ssh_key_name" {
   description = "SSH key name for EC2 instances"
   type        = string
+  default     = "monitoring-key"
 }
 
 variable "ecr_repositories" {
