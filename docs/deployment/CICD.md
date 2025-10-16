@@ -69,6 +69,38 @@ env:
 
 > 📝 **注意**: 实际的凭证需要通过 AWS IAM 控制台创建。参考下面的 IAM 用户配置部分。
 
+### 使用 AWS CLI 创建 IAM 用户
+
+如果您有 AWS CLI 访问权限，可以使用以下命令快速创建 GitHub Actions 用户：
+
+```bash
+# 1. 创建 GitHubActions IAM 用户
+aws iam create-user --user-name GitHubActions --region ap-northeast-1
+
+# 2. 附加 ECR 权限策略
+aws iam attach-user-policy --user-name GitHubActions --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser --region ap-northeast-1
+
+# 3. 创建访问密钥
+aws iam create-access-key --user-name GitHubActions --region ap-northeast-1
+```
+
+#### 输出示例
+
+创建访问密钥后的输出：
+```json
+{
+    "AccessKey": {
+        "UserName": "GitHubActions",
+        "AccessKeyId": "AKIA...",
+        "Status": "Active",
+        "SecretAccessKey": "...",
+        "CreateDate": "2025-10-16T11:11:01+00:00"
+    }
+}
+```
+
+> ⚠️ **重要**: 将输出的 `AccessKeyId` 和 `SecretAccessKey` 复制到 GitHub Secrets 中。
+
 ### AWS IAM 用户配置
 
 #### 用户信息
