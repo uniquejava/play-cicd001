@@ -10,11 +10,11 @@ image:
   backend:
     repository: 488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-backend-dev
     pullPolicy: IfNotPresent
-    tag: "latest"
+    tag: "43f349a75f0be113bc02082df84ca5c1eaf00fef"
   frontend:
     repository: 488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-frontend-dev
     pullPolicy: IfNotPresent
-    tag: "latest"
+    tag: "43f349a75f0be113bc02082df84ca5c1eaf00fef"
 
 # ArgoCD Image Updater configuration
 argocdImageUpdater:
