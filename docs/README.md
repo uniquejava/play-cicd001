@@ -1,31 +1,21 @@
 # 文档中心
 
-## 🚀 CI/CD部署
-- [部署指南](deployment/DEPLOYMENT.md) - 一键部署和验证
-- [EKS部署指南](deployment/EKS_DEPLOYMENT_GUIDE.md) - AWS EKS集群部署
-- [CI/CD流程](deployment/CICD.md) - GitHub Actions配置
-- [ArgoCD指南](deployment/ARGO.md) - GitOps和Image Updater
-- [CI/CD验证](deployment/CICD_VERIFICATION.md) - 完整流程测试
-- [GitHub Actions配置](deployment/github-actions-setup.md) - CI/CD详细配置
-- [NGINX配置](deployment/nginx-setup.md) - Ingress Controller设置
+## 🏗️ 核心文档
+- [**基础设施部署**](INFRASTRUCTURE.md) - Terraform + EKS 完整部署指南
+- [**CI/CD流程**](CICD.md) - GitHub Actions + ArgoCD + Image Updater 完整流程
+- [**自动化脚本**](SCRIPTS.md) - 部署和管理脚本使用指南
 
-## 🏗️ 基础设施
-- [基础设施概览](infrastructure/infra-README.md) - Terraform配置
-- [Kind本地集群](infrastructure/kind.md) - 本地开发环境
-
-## 📜 自动化脚本
-- [脚本指南](scripts/README.md) - 部署和管理脚本
-
-## 📋 项目信息
-- [项目说明](INSTRUCTION.md) - 开发注意事项
-- [项目计划](plan.md) - 实施状态和流程
-
-## 🎯 开发指南
+## 📋 其他文档
+- [项目说明](INSTRUCTION.md) - 项目背景和架构
 - [前端开发](frontend-README.md) - Vue 3应用开发
+- [项目计划](plan.md) - 开发里程碑
+- [Kind本地集群](infrastructure/kind.md) - 本地开发环境
+- [NGINX配置](deployment/nginx-setup.md) - Ingress Controller设置
+- [Helm迁移](deployment/HELM_MIGRATION.md) - Helm配置迁移记录
 
 ## 📖 CI/CD完整流程
 ```
-代码推送 → GitHub Actions CI → Docker构建 → ECR推送 → ArgoCD自动部署
+代码推送 → GitHub Actions CI → Docker构建 → ECR推送 → ArgoCD Image Updater → 自动部署
 ```
 
 ## 🚀 快速开始

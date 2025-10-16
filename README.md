@@ -72,18 +72,19 @@ pnpm install && pnpm dev
 - API服务封装
 
 **基础设施 (AWS)**
-- Amazon EKS 1.32 (Kubernetes)
+- Amazon EKS 1.34 (Kubernetes)
 - 2x t3.medium 工作节点
-- Application Load Balancer
+- Network Load Balancer (NLB)
+- NGINX Ingress Controller
 - Amazon ECR (容器镜像仓库)
 - VPC + 子网 + 安全组
 
 ### 部署架构
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   前端 (Vue 3)   │────│  NGINX Ingress   │────│  Load Balancer  │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌──────────────────┐    ┌────────────────────┐
+│   前端 (Vue 3)   │────│  NGINX Ingress   │────│ Network Load Balancer │
+└─────────────────┘    └──────────────────┘    └────────────────────┘
                                                         │
 ┌─────────────────┐    ┌──────────────────┐              │
 │  后端 (Spring)   │────│  K8s Services    │──────────────┘
@@ -146,21 +147,18 @@ play-cicd001/
 
 ```bash
 # 🚀 部署管理
-# 完整部署（基础设施 + 应用）
-./scripts/deploy.sh
-
-# 仅部署应用到现有集群
-./scripts/deploy.sh --skip-infra
-
-# 一键删除所有资源（节省费用）
-./scripts/destroy.sh
+./scripts/deploy.sh                               # 完整部署（基础设施 + 应用）
+./scripts/deploy.sh --skip-infra                  # 仅部署应用到现有集群
+./scripts/deploy.sh --skip-apps                   # 仅部署基础设施
+./scripts/destroy.sh                              # 一键删除所有资源（节省费用）
 
 # 🏗️ 基础设施管理
 cd infra
-terraform init                    # 初始化Terraform
-terraform plan                    # 查看执行计划
-terraform apply                   # 部署基础设施
-terraform destroy                 # 删除基础设施
+terraform init                                    # 初始化Terraform
+terraform plan                                    # 查看执行计划
+terraform apply                                   # 部署基础设施
+terraform destroy                                 # 删除基础设施
+aws eks --region ap-northeast-1 update-kubeconfig --name tix-eks-fresh-magpie  # 配置kubectl
 
 # ☸️ Kubernetes运维
 kubectl get pods -n ticket-dev                    # 查看Pod状态
@@ -171,12 +169,20 @@ kubectl logs -f deployment/frontend-deployment -n ticket-dev # 查看前端日�
 
 # 🚢 ArgoCD管理
 argocd app list                                   # 列出所有应用
-argocd app get ticket-app                        # 获取应用状态
-argocd app sync ticket-app                       # 手动同步应用
-argocd app logs ticket-app                       # 查看应用同步日志
+argocd app get ticket-system-dev                # 获取应用状态
+argocd app sync ticket-system-dev               # 手动同步应用
+argocd app logs ticket-system-dev               # 查看应用同步日志
 argocd cluster list                              # 查看集群列表
 kubectl get applications -n argocd               # 查看ArgoCD应用资源
 kubectl get appprojects -n argocd                # 查看ArgoCD项目
+
+# 🔍 ArgoCD Image Updater调试
+kubectl logs -n argocd -l app.kubernetes.io/name=argocd-image-updater -f  # 查看Image Updater日志
+kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-image-updater  # 检查Image Updater状态
+
+# 🔐 ECR凭据管理 (ArgoCD Image Updater)
+./scripts/setup-ecr-credentials.sh               # 生成ECR credentials
+kubectl apply -k cicd/k8s/argocd/               # 部署ECR凭据到ArgoCD
 
 # 🐳 本地开发
 cd backend && mvn spring-boot:run                 # 启动后端 (端口: 8080)
@@ -186,11 +192,22 @@ cd frontend && pnpm install && pnpm dev           # 启动前端 (端口: 5173)
 docker build -f cicd/docker/backend/Dockerfile -t ticket-backend ./backend
 docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
 ./scripts/docker/build-frontend.sh production    # 前端生产构建
+./scripts/docker/build-frontend.sh development   # 前端开发构建
 
 # 🧪 测试
 cd backend && mvn test                            # 后端测试
 cd frontend && pnpm test                          # 前端测试
 curl http://localhost:8080/api/tickets            # API测试
+
+# 📊 部署验证
+LB_URL=$(kubectl get ingress ticket-management-ingress -n ticket-dev -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')  # 获取负载均衡器地址
+curl http://$LB_URL/api/tickets                   # 测试线上API
+curl -I http://$LB_URL/                          # 测试前端页面
+
+# 📱 GitHub Actions监控
+gh run list --repo uniquejava/play-cicd001       # 查看CI/CD运行状态
+gh run view <run-id> --repo uniquejava/play-cicd001  # 查看具体运行详情
+gh run rerun <run-id> --repo uniquejava/play-cicd001  # 重新运行失败的workflow
 ```
 
 ## 📊 成本估算
@@ -228,7 +245,7 @@ curl http://localhost:8080/api/tickets            # API测试
 1. **代码提交** → GitHub仓库
 2. **自动构建** → GitHub Actions CI
 3. **镜像构建** → Docker + ECR推送
-4. **自动部署** → GitHub Actions CD
+4. **自动部署** → ArgoCD Image Updater
 5. **服务发布** → Kubernetes集群
 
 ### 分支策略
@@ -239,16 +256,7 @@ curl http://localhost:8080/api/tickets            # API测试
 
 ## 🧪 测试
 
-```bash
-# 后端测试
-cd backend && mvn test
-
-# 前端测试
-cd frontend && pnpm test
-
-# API测试
-curl http://localhost:8080/api/tickets
-```
+测试命令已包含在上方"常用命令"部分的"🧪 测试"分类中。
 
 ## 🛡️ 安全特性
 
@@ -258,34 +266,14 @@ curl http://localhost:8080/api/tickets
 - **镜像扫描**: ECR自动安全扫描
 - **密钥管理**: AWS Secrets Manager（可扩展）
 
-## 📞 支持
+## ⚠️ 重要提醒
 
-### 🆘 故障排除
-
-**常见问题**:
-1. **权限错误**: 检查AWS IAM权限
-2. **网络超时**: 检查安全组配置
-3. **部署失败**: 查看Pod日志: `kubectl logs -n ticket-dev deployment/backend-deployment`
-
-### 📖 更多资源
-
-- [Vue 3 官方文档](https://vuejs.org/)
-- [Spring Boot 文档](https://spring.io/projects/spring-boot)
-- [Kubernetes 文档](https://kubernetes.io/docs/)
-- [AWS EKS 文档](https://docs.aws.amazon.com/eks/)
-
-### 🤝 贡献
-
-欢迎提交Issue和Pull Request来改进项目。
+在不使用项目时，请运行 `./scripts/destroy.sh` 删除所有AWS资源以避免产生费用！
 
 ---
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+本项目采用 MIT 许可证。
 
----
-
-**⚠️ 重要提醒**: 在不使用项目时，请运行 `./scripts/destroy.sh` 删除所有AWS资源以避免产生费用！
-
-**📅 最后更新**: 2025-10-16
+**📅 最后更新**: 2025-10-17

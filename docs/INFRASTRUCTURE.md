@@ -6,12 +6,25 @@
 
 ## 架构设计
 
+### 部署架构
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌────────────────────┐
+│   前端 (Vue 3)   │────│  NGINX Ingress   │────│ Network Load Balancer │
+└─────────────────┘    └──────────────────┘    └────────────────────┘
+                                                        │
+┌─────────────────┐    ┌──────────────────┐              │
+│  后端 (Spring)   │────│  K8s Services    │──────────────┘
+└─────────────────┘    └──────────────────┘
+```
+
 ### 核心组件
 - **EKS Cluster**: Kubernetes 1.34
 - **VPC**: 10.0.0.0/16 (2私有子网 + 2公有子网)
 - **Worker Nodes**: 2x t3.medium (自动扩展1-3个)
 - **网络**: NAT Gateway + Internet Gateway
-- **Load Balancer**: Application Load Balancer
+- **Load Balancer**: Network Load Balancer (NLB)
+- **NGINX Ingress Controller**: Kubernetes Ingress Controller
 - **ECR**: Elastic Container Registry
 
 ### 费用估算

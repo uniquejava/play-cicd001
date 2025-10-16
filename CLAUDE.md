@@ -25,20 +25,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   │   ├── argocd/            # ArgoCD-specific configurations
 │   │   │   ├── ecr-credentials.yaml # ECR credentials for Image Updater
 │   │   │   └── kustomization.yaml    # ArgoCD kustomization
-│   │   ├── secrets/           # Secret templates
 │   │   ├── ingress.yaml       # Ingress configuration
 │   │   └── namespace.yaml     # Namespace definition
 │   ├── argocd/                # ArgoCD GitOps configurations
 │   │   └── applications/      # ArgoCD application definitions
-│   ├── docker/                # Dockerfile configurations
-│   │   ├── backend/Dockerfile
-│   │   └── frontend/Dockerfile
-│   └── github-actions/        # GitHub Actions workflows
-│       ├── ci.yml             # CI pipeline (build & push images)
-│       ├── cd-dev.yml         # CD pipeline to dev
-│       └── cd-prod.yml        # CD pipeline to prod
+│   └── docker/                # Dockerfile configurations
+│       ├── backend/Dockerfile
+│       └── frontend/Dockerfile
 ├── infra/                      # Terraform infrastructure code
-└── .github/workflows/          # GitHub Actions workflows (same as cicd/github-actions/)
+└── .github/workflows/          # GitHub Actions workflows
+│   ├── ci.yml                 # CI pipeline (build & push images)
+│   ├── cd-dev.yml             # CD pipeline to dev
+│   └── cd-prod.yml            # CD pipeline to prod
 ```
 
 ### 🔧 Essential Scripts & Commands
@@ -136,7 +134,7 @@ docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
 ## CI/CD Pipeline
 
 ### GitHub Actions Workflows
-- **CI Pipeline** (`cicd/github-actions/ci.yml`):
+- **CI Pipeline** (`.github/workflows/ci.yml`):
   - Triggers on push to main/develop and PRs to main
   - Tests and builds both backend (Maven) and frontend (pnpm)
   - Builds and pushes Docker images on main branch merges
@@ -145,14 +143,14 @@ docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
     - Backend: `ticket-management-backend-dev`
     - Frontend: `ticket-management-frontend-dev`
 
-- **CD Pipelines** (`cicd/github-actions/cd-dev.yml`, `cicd/github-actions/cd-prod.yml`):
+- **CD Pipelines** (`.github/workflows/cd-dev.yml`, `.github/workflows/cd-prod.yml`):
   - Separate deployment workflows for dev and prod environments
   - Manual trigger for production deployment
 
 ### Container Orchestration
-- **Kubernetes** (`cicd/k8s/`): YAML manifests for frontend/backend deployments with service configurations
+- **Kubernetes** (`cicd/k8s/`): Kustomize manifests for frontend/backend deployments with service configurations
 - **ArgoCD** (`cicd/argocd/`): GitOps configuration for continuous deployment
-- **Image Updater**: Automatic image tag updates from ECR
+- **Image Updater**: ✅ **完全可用** - 自动检测ECR新镜像并更新部署 (每2分钟检查)
 
 ### ArgoCD Configuration
 ```bash
@@ -166,10 +164,9 @@ argocd app list                          # List all applications
 kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-image-updater
 kubectl logs -n argocd deployment/argocd-image-updater
 
-# ECR Credentials Management
+# ECR Credentials Management (ArgoCD Image Updater)
 ./scripts/setup-ecr-credentials.sh           # Generate/update ECR credentials
-kubectl apply -f cicd/k8s/argocd/ecr-credentials.yaml  # Apply credentials
-kubectl apply -k cicd/k8s/argocd/             # Apply using kustomize
+kubectl apply -k cicd/k8s/argocd/             # Apply using kustomize (推荐)
 ```
 
 ### Kubernetes Management
@@ -187,14 +184,14 @@ kubectl logs -f deployment/backend-deployment -n ticket-dev
 kubectl logs -f deployment/frontend-deployment -n ticket-dev
 
 # Cleanup
-./scripts/k8s/cleanup-k8s.sh
+./scripts/destroy.sh                      # Complete cleanup (recommended)
 ```
 
 ## Infrastructure as Code
 
 ### Terraform EKS Setup (`/infra/`)
 - **Provider**: AWS
-- **Service**: EKS Kubernetes 1.32
+- **Service**: EKS Kubernetes 1.34
 - **Compute**: 2x t3.medium worker nodes (auto-scaling 1-3)
 - **Network**: Custom VPC (10.0.0.0/16) with public/private subnets
 - **Region**: ap-northeast-1
@@ -208,7 +205,7 @@ terraform plan                                    # Show execution plan
 terraform apply                                   # Deploy infrastructure
 aws eks --region ap-northeast-1 update-kubeconfig --name tix-eks-fresh-magpie  # Configure kubectl
 terraform destroy                                 # Destroy all resources
-./cleanup-eks.sh                                  # Alternative cleanup script
+./scripts/destroy.sh                              # Complete cleanup script (recommended)
 ```
 
 ### Deployment Scripts
@@ -300,62 +297,51 @@ cd frontend && pnpm test  # Currently no tests configured
 - Confirm current directory before executing search commands (find)
 - Avoid searching in subdirectories when not necessary
 
-## 🔄 ArgoCD GitOps Status & Next Steps
+## 📚 项目文档
 
-### ✅ **已完成配置 (2025-10-16)**
-1. **ArgoCD 安装**: 已安装并运行在 `argocd` namespace
-2. **Kustomize 支持**: 完整的 Kustomize 结构已配置
-   - 主配置: `cicd/k8s/kustomization.yaml`
-   - 后端配置: `cicd/k8s/backend/kustomization.yaml`
-   - 前端配置: `cicd/k8s/frontend/kustomization.yaml`
-3. **应用同步**: `ticket-system-dev` 应用已配置并正常同步
-4. **CI 优化**: 只在源代码变更时触发，避免无限循环
-5. **镜像管理**: 手动镜像标签更新已验证
+### 核心文档
+- **[基础设施部署](docs/INFRASTRUCTURE.md)** - Terraform + EKS 完整部署指南
+- **[CI/CD流程](docs/CICD.md)** - GitHub Actions + ArgoCD + Image Updater 完整流程
+- **[自动化脚本](docs/SCRIPTS.md)** - 部署和管理脚本使用指南
 
-### 🎯 **当前工作流程**
-```
-源代码变更 (backend/frontend/) → GitHub Actions CI → 构建/推送镜像到 ECR
-      ↓
-Git 配置变更 (k8s/) → ArgoCD 自动同步 → 更新 K8s 资源
-```
+### 其他文档
+- **[项目说明](docs/INSTRUCTION.md)** - 项目背景和架构
+- **[前端开发](docs/frontend-README.md)** - Vue 3开发说明
+- **[项目计划](docs/plan.md)** - 开发里程碑
 
-### 🚀 **已验证功能**
-- ✅ ArgoCD 自动同步 Git 配置
-- ✅ Kustomize 资源部署
-- ✅ CI 智能触发 (避免配置变更触发)
-- ✅ 手动镜像标签更新
-- ✅ 应用健康状态监控
+## 🔄 ArgoCD GitOps 状态
 
-### ⚠️ **待完善功能**
-1. **Image Updater 自动化**:
-   - 当前状态: 已配置但需要调试
-   - 问题: Image Updater 跳过 Kustomize 类型应用
-   - 下一步: 等待更长时间或调整配置
+### ✅ **完全可用状态 (2025-10-17)**
+1. **ArgoCD**: 已安装并运行在 `argocd` namespace
+2. **Image Updater**: ✅ **完全配置并可用**
+   - 自动检测ECR新镜像 (每2分钟检查)
+   - 自动更新Kubernetes部署
+   - ECR认证已配置
+3. **完整CI/CD流程**:
+   ```
+   代码推送 → GitHub Actions CI → Docker构建 → ECR推送 → ArgoCD Image Updater → 自动部署
+   ```
 
-2. **自动镜像更新**:
-   - 当前方式: 手动更新 `kustomization.yaml` 中的镜像标签
-   - 目标: Image Updater 自动检测 ECR 新镜像并更新
+### 🎯 **已验证功能**
+- ✅ GitHub Actions CI/CD (构建、测试、ECR推送)
+- ✅ ArgoCD GitOps 自动同步
+- ✅ Image Updater 自动镜像更新
+- ✅ Kustomize 资源管理
+- ✅ EKS 基础设施自动化部署
+- ✅ 一键部署脚本 (`./scripts/deploy.sh`)
 
-### 🔧 **调试 Image Updater**
+### 🔧 **常用命令**
 ```bash
-# 检查 Image Updater 日志
-kubectl logs -n argocd deployment/argocd-image-updater -f
+# 完整部署
+./scripts/deploy.sh
 
-# 手动触发扫描
-kubectl patch application ticket-system-dev -n argocd -p '{"metadata":{"annotations":{"argocd-image-updater.argoproj.io/write-back-method":"git"}}}'
+# 检查Image Updater状态
+kubectl logs -n argocd -l app.kubernetes.io/name=argocd-image-updater -f
 
-# 检查应用配置
-argocd app get ticket-system-dev -o yaml | grep -A 20 annotations
+# ArgoCD应用管理
+argocd app get ticket-system-dev
+argocd app sync ticket-system-dev
+
+# 清理资源
+./scripts/destroy.sh
 ```
-
-### 📋 **下次继续工作清单**
-1. [ ] 检查 Image Updater 是否开始识别应用
-2. [ ] 如需要，调整 Image Updater 配置
-3. [ ] 测试完整的自动镜像更新流程
-4. [ ] 考虑添加生产环境配置
-5. [ ] 完善监控和告警
-
-### 💡 **重要提示**
-- **避免循环**: CI 已优化，配置变更不会触发构建
-- **手动更新**: 目前镜像标签需要手动更新到 `kustomization.yaml`
-- **稳定运行**: GitOps 核心功能已完全可用

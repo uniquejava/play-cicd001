@@ -4,7 +4,7 @@
 
 本项目实现了完整的 GitOps CI/CD 流水线：
 ```
-代码推送 → GitHub Actions CI → Docker构建 → ECR推送 → ArgoCD自动部署
+代码推送 → GitHub Actions CI → Docker构建 → ECR推送 → ArgoCD Image Updater → 自动部署
 ```
 
 ## 核心组件
