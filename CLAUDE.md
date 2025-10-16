@@ -17,7 +17,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │   ├── deploy.sh              # Main deployment script (infrastructure + apps)
 │   └── docker/                # Docker build scripts
 ├── cicd/                       # CI/CD configurations
-│   ├── k8s/                   # Kubernetes YAML manifests
+│   ├── k8s/                   # Kubernetes manifests (Kustomize)
+│   │   ├── kustomization.yaml # Kustomize configuration
 │   │   ├── backend/           # Backend deployment & service
 │   │   ├── frontend/          # Frontend deployment & service
 │   │   ├── ingress.yaml       # Ingress configuration

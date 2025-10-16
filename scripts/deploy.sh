@@ -198,23 +198,13 @@ build_and_push_images() {
 
 # 部署应用
 deploy_applications() {
-    print_step "5" "部署应用 (K8s YAML)"
+    print_step "5" "部署应用 (Kustomize)"
 
     cd "$K8S_DIR"
 
-    # 部署后端
-    print_info "部署后端服务..."
-    kubectl apply -f backend/deployment.yaml -n "$NAMESPACE"
-    kubectl apply -f backend/service.yaml -n "$NAMESPACE"
-
-    # 部署前端
-    print_info "部署前端服务..."
-    kubectl apply -f frontend/deployment.yaml -n "$NAMESPACE"
-    kubectl apply -f frontend/service.yaml -n "$NAMESPACE"
-
-    # 部署Ingress
-    print_info "部署Ingress配置..."
-    kubectl apply -f ingress.yaml -n "$NAMESPACE"
+    # 使用 Kustomize 部署所有应用
+    print_info "使用 Kustomize 部署应用..."
+    kubectl apply -k . -n "$NAMESPACE"
 
     print_success "应用部署完成"
 }
