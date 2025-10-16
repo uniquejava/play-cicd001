@@ -11,8 +11,8 @@ K8S_DIR="$PROJECT_ROOT/cicd/k8s"
 
 # 环境配置
 NAMESPACE="ticket-dev"
-CLUSTER_NAME="ticket-system-eks"
-REGION="ap-southeast-1"
+CLUSTER_NAME="ticket-system-eks-final"
+REGION="ap-northeast-1"
 
 # 颜色输出
 GREEN='\033[0;32m'

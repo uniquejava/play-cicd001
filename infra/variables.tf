@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region"
   type        = string
-  default     = "ap-southeast-1"
+  default     = "ap-northeast-1"
 }
 
 variable "environment" {
@@ -13,13 +13,13 @@ variable "environment" {
 variable "cluster_name" {
   description = "EKS cluster name"
   type        = string
-  default     = "ticket-system-eks"
+  default     = "ticket-system-eks-final"
 }
 
 variable "eks_version" {
   description = "EKS Kubernetes version"
   type        = string
-  default     = "1.32"
+  default     = "1.34"
 }
 
 variable "vpc_cidr" {
