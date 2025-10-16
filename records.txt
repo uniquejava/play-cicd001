@@ -14,3 +14,5 @@ ESC
 请根据当前aws resource 的状态重建本地的tf state, 确保tf plan 输出的 created/changed resource数均为0.
 
 目前的ecr有问题, 登录不了, 可以删除重建吗, 其他resource比如vpc和eks不要动
+
+后端的Dockerfile我加了私有的nexus仓库, 这个在github CI里不好使, 备份一下, 去掉那段设置, 备份名比如Dockerfile_local, 你以为如何?
