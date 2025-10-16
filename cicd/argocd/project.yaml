@@ -6,8 +6,7 @@ metadata:
 spec:
   description: Ticket Management System Project
   sourceRepos:
-  - repoURL: https://github.com/uniquejava/play-cicd001.git
-    targetRevision: HEAD
+  - https://github.com/uniquejava/play-cicd001.git
   destinations:
   - namespace: ticket-*
     server: https://kubernetes.default.svc
@@ -20,11 +19,6 @@ spec:
     kind: Service
   - group: networking.k8s.io
     kind: Ingress
-  orphanedResources:
-  - group: ""
-    kind: ConfigMap
-  - group: ""
-    kind: Secret
   roles:
   - name: admin
     description: Admin privileges for the project

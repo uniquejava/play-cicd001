@@ -3,8 +3,8 @@
 # Declare variables to be passed into your templates.
 
 replicaCount:
-  backend: 2
-  frontend: 2
+  backend: 1
+  frontend: 1
 
 image:
   backend:
