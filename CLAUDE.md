@@ -2,6 +2,73 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 📍 Important Project Information
+
+### Project Root & Structure
+- **Project Root**: `/Users/cyper/code/play-cicd001`
+- **Working Directory**: Always work from project root unless specified otherwise
+
+### 🗂️ Key Directories & Files
+```
+/Users/cyper/code/play-cicd001/
+├── backend/                    # Spring Boot backend application
+├── frontend/                   # Vue 3 frontend application
+├── scripts/                    # Deployment and utility scripts
+│   ├── deploy.sh              # Main deployment script (infrastructure + apps)
+│   └── docker/                # Docker build scripts
+├── cicd/                       # CI/CD configurations
+│   ├── k8s/                   # Kubernetes YAML manifests
+│   │   ├── backend/           # Backend deployment & service
+│   │   ├── frontend/          # Frontend deployment & service
+│   │   ├── ingress.yaml       # Ingress configuration
+│   │   └── namespace.yaml     # Namespace definition
+│   ├── argocd/                # ArgoCD GitOps configurations
+│   │   └── applications/      # ArgoCD application definitions
+│   ├── docker/                # Dockerfile configurations
+│   │   ├── backend/Dockerfile
+│   │   └── frontend/Dockerfile
+│   └── github-actions/        # GitHub Actions workflows
+│       ├── ci.yml             # CI pipeline (build & push images)
+│       ├── cd-dev.yml         # CD pipeline to dev
+│       └── cd-prod.yml        # CD pipeline to prod
+├── infra/                      # Terraform infrastructure code
+└── .github/workflows/          # GitHub Actions workflows (same as cicd/github-actions/)
+```
+
+### 🔧 Essential Scripts & Commands
+```bash
+# Main deployment (from project root)
+./scripts/deploy.sh                    # Full deployment (infra + apps)
+./scripts/deploy.sh --skip-infra       # Deploy apps to existing cluster
+./scripts/deploy.sh --skip-apps        # Deploy infrastructure only
+
+# Local development
+cd backend && mvn spring-boot:run      # Start backend (port 8080)
+cd frontend && pnpm dev                 # Start frontend (port 5173)
+
+# Kubernetes management
+kubectl get pods -n ticket-dev          # Check application pods
+kubectl get ingress -n ticket-dev       # Check ingress configuration
+argocd app get ticket-system-dev        # Check ArgoCD application status
+```
+
+### 🌐 Access URLs & Endpoints
+- **ArgoCD UI**: `https://a3f22fb2180504cc0baf0ba3b19f827e-1224003370.ap-northeast-1.elb.amazonaws.com`
+- **Application**: `http://ae61e6110ead2413e8e7d119b5b871f9-1708833654.ap-northeast-1.elb.amazonaws.com`
+- **Backend API**: `http://ae61e6110ead2413e8e7d119b5b871f9-1708833654.ap-northeast-1.elb.amazonaws.com/api/tickets`
+
+### 🐳 Docker Images (ECR)
+- **Registry**: `488363440930.dkr.ecr.ap-northeast-1.amazonaws.com`
+- **Backend**: `ticket-management-backend-dev`
+- **Frontend**: `ticket-management-frontend-dev`
+- **Current Tag**: `90bf0ecb5d5ba997b8fa3ff0f9cfdf201d33ebdc`
+
+### ⚙️ Important Configurations
+- **K8s Namespace**: `ticket-dev`
+- **EKS Cluster**: `tix-eks-fresh-magpie`
+- **AWS Region**: `ap-northeast-1`
+- **Git Repository**: `https://github.com/uniquejava/play-cicd001.git`
+
 ## Project Overview
 
 This is a **Ticket Management System CI/CD demonstration project** showcasing modern DevOps practices with a microservices architecture (Spring Boot backend + Vue 3 frontend). The project demonstrates a complete pipeline from development to production deployment using infrastructure as code, containerization, and GitOps.
@@ -79,6 +146,20 @@ docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
 ### Container Orchestration
 - **Kubernetes** (`cicd/k8s/`): YAML manifests for frontend/backend deployments with service configurations
 - **ArgoCD** (`cicd/argocd/`): GitOps configuration for continuous deployment
+- **Image Updater**: Automatic image tag updates from ECR
+
+### ArgoCD Configuration
+```bash
+# ArgoCD Access
+argocd login <ARGOCD_URL> --username admin --password <PASSWORD>
+argocd app get ticket-system-dev         # Check application status
+argocd app sync ticket-system-dev        # Manual sync
+argocd app list                          # List all applications
+
+# Image Updater
+kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-image-updater
+kubectl logs -n argocd deployment/argocd-image-updater
+```
 
 ### Kubernetes Management
 ```bash
