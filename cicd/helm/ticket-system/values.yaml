@@ -16,6 +16,15 @@ image:
     pullPolicy: IfNotPresent
     tag: "latest"
 
+# ArgoCD Image Updater configuration
+argocdImageUpdater:
+  backend:
+    allowTags: "^[a-fA-F0-9]+$"
+    updateStrategy: "version"
+  frontend:
+    allowTags: "^[a-fA-F0-9]+$"
+    updateStrategy: "version"
+
 nameOverride: ""
 fullnameOverride: ""
 

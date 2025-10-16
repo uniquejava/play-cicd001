@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ticket-system.fullname" . }}-frontend
+  labels:
+    {{- include "ticket-system.labels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "ticket-system.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: frontend
