@@ -5,6 +5,8 @@
 [![CI Status](https://github.com/your-username/play-cicd001/workflows/CI/badge.svg)](https://github.com/your-username/play-cicd001/actions)
 [![CD Status](https://github.com/your-username/play-cicd001/workflows/CD/badge.svg)](https://github.com/your-username/play-cicd001/actions)
 
+![screenshot](./docs/screenshot.jpg)
+
 ## 🎯 项目概览
 
 这是一个**前后端分离的微服务架构**项目，展示了从开发到生产的完整DevOps实践：
