@@ -289,3 +289,63 @@ cd frontend && pnpm test  # Currently no tests configured
 ### Development Practices
 - Confirm current directory before executing search commands (find)
 - Avoid searching in subdirectories when not necessary
+
+## 🔄 ArgoCD GitOps Status & Next Steps
+
+### ✅ **已完成配置 (2025-10-16)**
+1. **ArgoCD 安装**: 已安装并运行在 `argocd` namespace
+2. **Kustomize 支持**: 完整的 Kustomize 结构已配置
+   - 主配置: `cicd/k8s/kustomization.yaml`
+   - 后端配置: `cicd/k8s/backend/kustomization.yaml`
+   - 前端配置: `cicd/k8s/frontend/kustomization.yaml`
+3. **应用同步**: `ticket-system-dev` 应用已配置并正常同步
+4. **CI 优化**: 只在源代码变更时触发，避免无限循环
+5. **镜像管理**: 手动镜像标签更新已验证
+
+### 🎯 **当前工作流程**
+```
+源代码变更 (backend/frontend/) → GitHub Actions CI → 构建/推送镜像到 ECR
+      ↓
+Git 配置变更 (k8s/) → ArgoCD 自动同步 → 更新 K8s 资源
+```
+
+### 🚀 **已验证功能**
+- ✅ ArgoCD 自动同步 Git 配置
+- ✅ Kustomize 资源部署
+- ✅ CI 智能触发 (避免配置变更触发)
+- ✅ 手动镜像标签更新
+- ✅ 应用健康状态监控
+
+### ⚠️ **待完善功能**
+1. **Image Updater 自动化**:
+   - 当前状态: 已配置但需要调试
+   - 问题: Image Updater 跳过 Kustomize 类型应用
+   - 下一步: 等待更长时间或调整配置
+
+2. **自动镜像更新**:
+   - 当前方式: 手动更新 `kustomization.yaml` 中的镜像标签
+   - 目标: Image Updater 自动检测 ECR 新镜像并更新
+
+### 🔧 **调试 Image Updater**
+```bash
+# 检查 Image Updater 日志
+kubectl logs -n argocd deployment/argocd-image-updater -f
+
+# 手动触发扫描
+kubectl patch application ticket-system-dev -n argocd -p '{"metadata":{"annotations":{"argocd-image-updater.argoproj.io/write-back-method":"git"}}}'
+
+# 检查应用配置
+argocd app get ticket-system-dev -o yaml | grep -A 20 annotations
+```
+
+### 📋 **下次继续工作清单**
+1. [ ] 检查 Image Updater 是否开始识别应用
+2. [ ] 如需要，调整 Image Updater 配置
+3. [ ] 测试完整的自动镜像更新流程
+4. [ ] 考虑添加生产环境配置
+5. [ ] 完善监控和告警
+
+### 💡 **重要提示**
+- **避免循环**: CI 已优化，配置变更不会触发构建
+- **手动更新**: 目前镜像标签需要手动更新到 `kustomization.yaml`
+- **稳定运行**: GitOps 核心功能已完全可用
