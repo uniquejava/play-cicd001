@@ -15,6 +15,6 @@ resources:
 
 images:
   - name: 488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-backend-dev
-    newTag: 90bf0ecb5d5ba997b8fa3ff0f9cfdf201d33ebdc
+    newTag: d6936de32c0b766dcf2dd2a1eff1a3b09eb5a07a
   - name: 488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-frontend-dev
-    newTag: 90bf0ecb5d5ba997b8fa3ff0f9cfdf201d33ebdc
+    newTag: d6936de32c0b766dcf2dd2a1eff1a3b09eb5a07a
