@@ -77,8 +77,7 @@ docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
   - Manual trigger for production deployment
 
 ### Container Orchestration
-- **Kubernetes** (`cicd/k8s/`): Separate deployments for frontend/backend with service configurations
-- **Helm Charts** (`cicd/helm/`): Package management with environment-specific values
+- **Kubernetes** (`cicd/k8s/`): YAML manifests for frontend/backend deployments with service configurations
 - **ArgoCD** (`cicd/argocd/`): GitOps configuration for continuous deployment
 
 ### Kubernetes Management

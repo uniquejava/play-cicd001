@@ -75,10 +75,7 @@ check_dependencies() {
         missing_tools+=("terraform")
     fi
 
-    if ! command -v helm &> /dev/null; then
-        missing_tools+=("helm")
-    fi
-
+  
     if [[ ${#missing_tools[@]} -gt 0 ]]; then
         print_error "缺少以下工具: ${missing_tools[*]}"
         print_info "请安装缺少的工具后重试"
@@ -149,23 +146,9 @@ deploy_infrastructure() {
 deploy_ingress() {
     print_step "2" "部署 NGINX Ingress Controller"
 
-    # 添加Helm仓库
-    print_info "添加NGINX Ingress Helm仓库..."
-    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-    helm repo update
-
-    # 部署NGINX Ingress Controller
+    # 部署NGINX Ingress Controller 使用kubectl
     print_info "部署NGINX Ingress Controller..."
-    helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-        --namespace ingress-nginx \
-        --create-namespace \
-        --set controller.replicaCount=1 \
-        --set controller.resources.requests.cpu=100m \
-        --set controller.resources.requests.memory=128Mi \
-        --set controller.resources.limits.cpu=500m \
-        --set controller.resources.limits.memory=512Mi \
-        --set controller.service.type=LoadBalancer \
-        --set controller.service.externalTrafficPolicy=Local
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0-beta.0/deploy/static/provider/cloud/deploy.yaml
 
     print_success "NGINX Ingress Controller部署完成"
 }
@@ -215,24 +198,23 @@ build_and_push_images() {
 
 # 部署应用
 deploy_applications() {
-    print_step "5" "部署应用"
+    print_step "5" "部署应用 (K8s YAML)"
 
     cd "$K8S_DIR"
 
     # 部署后端
     print_info "部署后端服务..."
-    kubectl apply -f backend/deployment.yaml
-    kubectl apply -f backend/service.yaml
+    kubectl apply -f backend/deployment.yaml -n "$NAMESPACE"
+    kubectl apply -f backend/service.yaml -n "$NAMESPACE"
 
     # 部署前端
     print_info "部署前端服务..."
-    kubectl apply -f frontend/deployment.yaml
-    kubectl apply -f frontend/service.yaml
+    kubectl apply -f frontend/deployment.yaml -n "$NAMESPACE"
+    kubectl apply -f frontend/service.yaml -n "$NAMESPACE"
 
     # 部署Ingress
     print_info "部署Ingress配置..."
-    #kubectl apply -f ingress-class.yaml
-    kubectl apply -f ingress.yaml
+    kubectl apply -f ingress.yaml -n "$NAMESPACE"
 
     print_success "应用部署完成"
 }

@@ -13,7 +13,7 @@
 
 - 🏗️ **现代化架构**: Spring Boot 3.5.6 + Vue 3 + TypeScript
 - 🚀 **容器化部署**: Docker + Kubernetes + EKS
-- 🔄 **CI/CD流水线**: GitHub Actions + Helm + ArgoCD
+- 🔄 **CI/CD流水线**: GitHub Actions + Kubernetes + ArgoCD
 - 📊 **可观测性**: 日志监控 + 健康检查
 - 🛡️ **安全最佳实践**: 最小权限原则 + 安全扫描
 
