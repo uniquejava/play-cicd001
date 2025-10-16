@@ -28,6 +28,16 @@ spec:
     - host: {{ .host | quote }}
       http:
         paths:
+          # ArgoCD route
+          - path: /argocd
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                namespace: argocd
+                port:
+                  number: 443
+          # Frontend routes
           {{- range .paths }}
           - path: {{ .path }}
             {{- if .pathType }}
