@@ -92,23 +92,16 @@ pnpm install && pnpm dev
 
 ## 📚 文档导航
 
-### 🚀 部署相关
-- [**部署指南**](docs/deployment/DEPLOYMENT.md) - 完整部署流程
-- [**EKS部署指南**](docs/deployment/EKS_DEPLOYMENT_GUIDE.md) - AWS EKS详细步骤
-- [**NGINX配置**](docs/deployment/nginx-setup.md) - Ingress Controller设置
-- [**CI/CD验证**](docs/deployment/CICD_VERIFICATION.md) - 流程验证测试
+### 🏗️ 核心文档
+- [**基础设施部署**](docs/INFRASTRUCTURE.md) - Terraform + EKS 完整部署指南
+- [**CI/CD流程**](docs/CICD.md) - GitHub Actions + ArgoCD + Image Updater
+- [**自动化脚本**](docs/SCRIPTS.md) - 部署和管理脚本使用指南
 
-### 🏗️ 基础设施
-- [**基础设施文档**](docs/infrastructure/infra-README.md) - Terraform配置说明
-- [**本地开发环境**](docs/infrastructure/kind.md) - Kind集群设置
-
-### 📜 自动化脚本
-- [**脚本使用指南**](docs/scripts/README.md) - 自动化脚本说明
-
-### 📋 项目文档
+### 📋 其他文档
 - [**项目说明**](docs/INSTRUCTION.md) - 项目背景和架构
-- [**前端开发指南**](docs/frontend-README.md) - Vue 3开发说明
+- [**前端开发**](docs/frontend-README.md) - Vue 3开发说明
 - [**项目计划**](docs/plan.md) - 开发里程碑
+- [**Kind本地集群**](docs/infrastructure/kind.md) - 本地开发环境
 
 ## 🛠️ 开发指南
 
@@ -117,74 +110,87 @@ pnpm install && pnpm dev
 ```
 play-cicd001/
 ├── backend/                    # Spring Boot后端应用
-│   ├── src/main/java/         # Java源代码
-│   ├── src/test/              # 单元测试
-│   ├── pom.xml               # Maven配置
-│   └── Dockerfile            # 容器化配置
 ├── frontend/                  # Vue 3前端应用
-│   ├── src/                   # Vue源代码
-│   ├── public/               # 静态资源
-│   ├── package.json          # 前端依赖
-│   └── Dockerfile            # 容器化配置
 ├── cicd/                      # CI/CD配置文件
 │   ├── docker/               # Docker构建配置
 │   ├── k8s/                  # Kubernetes部署文件
-│   ├── helm/                 # Helm Charts
-│   └── github-actions/       # GitHub Actions工作流
+│   │   ├── backend/          # 后端K8s配置
+│   │   ├── frontend/         # 前端K8s配置
+│   │   └── argocd/           # ArgoCD配置
+│   └── argocd/               # ArgoCD应用配置
 ├── infra/                     # Terraform基础设施
 │   ├── modules/              # Terraform模块
+│   │   ├── vpc/              # VPC网络配置
+│   │   └── ecr/              # ECR镜像仓库
 │   ├── main.tf               # 主配置文件
-│   └── variables.tf          # 变量定义
+│   ├── variables.tf          # 变量定义
+│   └── outputs.tf            # 输出配置
 ├── scripts/                   # 自动化脚本
 │   ├── deploy.sh             # 一键部署脚本
 │   ├── destroy.sh            # 一键删除脚本
-│   └── docker/               # Docker构建脚本
+│   ├── docker/               # Docker构建脚本
+│   ├── k8s/                  # Kubernetes管理脚本
+│   └── terraform/            # Terraform管理脚本
+├── .github/workflows/         # GitHub Actions工作流
 ├── docs/                      # 项目文档
+│   ├── INFRASTRUCTURE.md      # Terraform + EKS 部署指南
+│   ├── CICD.md               # CI/CD 完整流程
+│   ├── SCRIPTS.md            # 自动化脚本指南
+│   ├── INSTRUCTION.md        # 项目背景架构
+│   └── plan.md               # 开发里程碑
+├── records.txt                # 部署记录
 └── CLAUDE.md                  # Claude Code配置
 ```
 
 ### 🔧 常用命令
 
 ```bash
-# === 应用管理 ===
-# 一键部署
+# 🚀 部署管理
+# 完整部署（基础设施 + 应用）
 ./scripts/deploy.sh
-
-# 一键删除（节省费用）
-./scripts/destroy.sh
 
 # 仅部署应用到现有集群
 ./scripts/deploy.sh --skip-infra
 
-# === 基础设施 ===
-# 初始化Terraform
-cd infra && terraform init
+# 一键删除所有资源（节省费用）
+./scripts/destroy.sh
 
-# 查看执行计划
-terraform plan
+# 🏗️ 基础设施管理
+cd infra
+terraform init                    # 初始化Terraform
+terraform plan                    # 查看执行计划
+terraform apply                   # 部署基础设施
+terraform destroy                 # 删除基础设施
 
-# 应用基础设施
-terraform apply
+# ☸️ Kubernetes运维
+kubectl get pods -n ticket-dev                    # 查看Pod状态
+kubectl get services -n ticket-dev                # 查看服务
+kubectl get ingress -n ticket-dev                 # 查看Ingress
+kubectl logs -f deployment/backend-deployment -n ticket-dev  # 查看后端日志
+kubectl logs -f deployment/frontend-deployment -n ticket-dev # 查看前端日志
 
-# 删除基础设施
-terraform destroy
+# 🚢 ArgoCD管理
+argocd app list                                   # 列出所有应用
+argocd app get ticket-app                        # 获取应用状态
+argocd app sync ticket-app                       # 手动同步应用
+argocd app logs ticket-app                       # 查看应用同步日志
+argocd cluster list                              # 查看集群列表
+kubectl get applications -n argocd               # 查看ArgoCD应用资源
+kubectl get appprojects -n argocd                # 查看ArgoCD项目
 
-# === Kubernetes ===
-# 查看Pod状态
-kubectl get pods -n ticket-dev
+# 🐳 本地开发
+cd backend && mvn spring-boot:run                 # 启动后端 (端口: 8080)
+cd frontend && pnpm install && pnpm dev           # 启动前端 (端口: 5173)
 
-# 查看服务
-kubectl get services -n ticket-dev
-
-# 查看Ingress
-kubectl get ingress -n ticket-dev
-
-# === Docker构建 ===
-# 构建前端镜像
-./scripts/docker/build-frontend.sh production
-
-# 构建后端镜像
+# 🔨 本地构建
 docker build -f cicd/docker/backend/Dockerfile -t ticket-backend ./backend
+docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
+./scripts/docker/build-frontend.sh production    # 前端生产构建
+
+# 🧪 测试
+cd backend && mvn test                            # 后端测试
+cd frontend && pnpm test                          # 前端测试
+curl http://localhost:8080/api/tickets            # API测试
 ```
 
 ## 📊 成本估算
