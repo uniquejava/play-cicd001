@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: 488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-backend-dev:90bf0ecb5d5ba997b8fa3ff0f9cfdf201d33ebdc
+        image: 488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-backend:dev-90bf0ecb
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080

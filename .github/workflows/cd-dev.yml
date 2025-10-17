@@ -2,7 +2,7 @@ name: CD to Development
 
 on:
   workflow_run:
-    workflows: ["CI Pipeline - Dev"]
+    workflows: ["CI Pipeline"]
     types:
       - completed
     branches: [ develop ]
@@ -10,32 +10,12 @@ on:
 jobs:
   deploy-dev:
     runs-on: ubuntu-latest
-    name: Deploy to Development
+    name: Deploy to Development (Disabled)
     environment: development
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v4
-      with:
-        version: 'v1.32.0'
-
-    - name: Configure kubectl
+    - name: Skip deployment (placeholder)
       run: |
-        echo "${{ secrets.KUBECONFIG_DEV }}" | base64 -d > kubeconfig
-        export KUBECONFIG=kubeconfig
-
-    - name: Deploy to Development
-      run: |
-        export KUBECONFIG=kubeconfig
-        kubectl apply -f cicd/k8s/namespace.yaml
-        kubectl apply -f cicd/k8s/backend/
-        kubectl apply -f cicd/k8s/frontend/
-
-    - name: Verify Deployment
-      run: |
-        export KUBECONFIG=kubeconfig
-        kubectl rollout status deployment/backend-deployment -n ticket-dev
-        kubectl rollout status deployment/frontend-deployment -n ticket-dev
+        echo "🚫 Development deployment is temporarily disabled"
+        echo "📝 CD pipeline is paused - no infrastructure available"
+        echo "✅ Workflow completed successfully (no-op)"

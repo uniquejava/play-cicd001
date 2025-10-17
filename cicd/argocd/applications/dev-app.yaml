@@ -5,11 +5,11 @@ metadata:
   namespace: argocd
   annotations:
     # ArgoCD Image Updater annotations
-    argocd-image-updater.argoproj.io/image-list: backend=488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-backend-dev,frontend=488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-frontend-dev
+    argocd-image-updater.argoproj.io/image-list: backend=488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-backend,frontend=488363440930.dkr.ecr.ap-northeast-1.amazonaws.com/ticket-management-frontend
     argocd-image-updater.argoproj.io/backend.update-strategy: newest-build
-    argocd-image-updater.argoproj.io/backend.allow-tags: regexp:^[a-fA-F0-9]{40}$
+    argocd-image-updater.argoproj.io/backend.allow-tags: regexp:^dev-[a-fA-F0-9]{8}$
     argocd-image-updater.argoproj.io/frontend.update-strategy: newest-build
-    argocd-image-updater.argoproj.io/frontend.allow-tags: regexp:^[a-fA-F0-9]{40}$
+    argocd-image-updater.argoproj.io/frontend.allow-tags: regexp:^dev-[a-fA-F0-9]{8}$
 spec:
   project: ticket-system
   source:

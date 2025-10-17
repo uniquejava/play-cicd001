@@ -7,7 +7,7 @@ import TicketList from './components/TicketList.vue'
     <header class="app-header">
       <h1>🎫 Ticket Management System</h1>
       <p>A simple CI/CD demonstration project</p>
-      <small style="color: #999; font-size: 12px;">v1.0.2 - Full CI/CD Flow Test 🚀</small>
+      <small style="color: #999; font-size: 12px;">v1.0.3 - Full CI/CD Flow Test 🚀</small>
     </header>
 
     <main class="app-main">
