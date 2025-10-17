@@ -103,6 +103,7 @@ pnpm install && pnpm dev
 - [**Infrastructure Deployment**](docs/INFRASTRUCTURE.md) - Terraform + EKS Complete Deployment Guide
 - [**CI/CD Pipeline**](docs/CICD.md) - GitHub Actions + ArgoCD + Image Updater
 - [**Automation Scripts**](docs/SCRIPTS.md) - Deployment and Management Scripts Guide
+- [**CI/CD Structure**](cicd/README.md) - Complete CI/CD Directory Structure Guide
 
 ### 📋 Other Documentation
 - [**Project Description**](docs/INSTRUCTION.md) - Project Background and Architecture
@@ -120,11 +121,16 @@ play-cicd001/
 ├── frontend/                  # Vue 3 frontend application
 ├── cicd/                      # CI/CD configurations
 │   ├── docker/               # Docker build configurations
-│   ├── k8s/                  # Kubernetes deployment files
-│   │   ├── backend/          # Backend K8s configurations
-│   │   ├── frontend/         # Frontend K8s configurations
-│   │   └── argocd/           # ArgoCD configurations
-│   └── argocd/               # ArgoCD application configurations
+│   ├── kubernetes/           # Kubernetes manifests (Kustomize)
+│   │   ├── base/             # Base configurations
+│   │   ├── overlays/         # Environment-specific configs
+│   │   │   ├── dev/          # Development environment
+│   │   │   └── prod/         # Production environment
+│   │   └── tools/            # K8s tool configurations
+│   ├── argocd/               # ArgoCD GitOps configurations
+│   │   ├── apps/             # ArgoCD Application definitions
+│   │   └── project.yaml      # ArgoCD Project configuration
+│   └── github_action/        # GitHub Actions scripts
 ├── infra/                     # Terraform infrastructure
 │   ├── modules/              # Terraform modules
 │   │   ├── vpc/              # VPC network configuration
@@ -146,7 +152,8 @@ play-cicd001/
 │   ├── INSTRUCTION.md        # Project background and architecture
 │   └── plan.md               # Development milestones
 ├── records.txt                # Deployment records
-└── CLAUDE.md                  # Claude Code configuration
+├── CLAUDE.md                  # Claude Code configuration
+└── cicd/README.md             # CI/CD directory structure guide
 ```
 
 ### 🔧 Common Commands
@@ -188,7 +195,7 @@ kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-image-updater  # Che
 
 # 🔐 ECR Credentials Management (ArgoCD Image Updater)
 ./scripts/setup-ecr-credentials.sh               # Generate ECR credentials
-kubectl apply -k cicd/k8s/argocd/               # Deploy ECR credentials to ArgoCD
+kubectl apply -k cicd/kubernetes/tools/argocd/   # Deploy ECR credentials to ArgoCD
 
 # 🐳 Local Development
 cd backend && mvn spring-boot:run                 # Start backend (port: 8080)

@@ -7,7 +7,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 INFRA_DIR="$PROJECT_ROOT/infra"
-K8S_DIR="$PROJECT_ROOT/cicd/k8s"
+KUBERNETES_DIR="$PROJECT_ROOT/cicd/kubernetes"
 
 # 环境配置
 NAMESPACE="ticket-dev"
@@ -178,20 +178,20 @@ build_and_push_images() {
     # 构建后端镜像
     print_info "构建后端Docker镜像..."
     docker build -f cicd/docker/backend/Dockerfile -t ticket-backend ./backend
-    docker tag ticket-backend:latest "${ecr_registry}/ticket-management-backend-dev:latest"
+    docker tag ticket-backend:latest "${ecr_registry}/ticket-management-backend:dev-latest"
 
     # 构建前端镜像
     print_info "构建前端Docker镜像..."
     docker build -f cicd/docker/frontend/Dockerfile -t ticket-frontend ./frontend
-    docker tag ticket-frontend:latest "${ecr_registry}/ticket-management-frontend-dev:latest"
+    docker tag ticket-frontend:latest "${ecr_registry}/ticket-management-frontend:dev-latest"
 
     # 推送后端镜像
     print_info "推送后端镜像到ECR..."
-    docker push "${ecr_registry}/ticket-management-backend-dev:latest"
+    docker push "${ecr_registry}/ticket-management-backend:dev-latest"
 
     # 推送前端镜像
     print_info "推送前端镜像到ECR..."
-    docker push "${ecr_registry}/ticket-management-frontend-dev:latest"
+    docker push "${ecr_registry}/ticket-management-frontend:dev-latest"
 
     print_success "Docker镜像构建和推送完成"
 }
@@ -200,11 +200,11 @@ build_and_push_images() {
 deploy_applications() {
     print_step "5" "部署应用 (Kustomize)"
 
-    cd "$K8S_DIR"
+    cd "$KUBERNETES_DIR"
 
-    # 使用 Kustomize 部署所有应用
-    print_info "使用 Kustomize 部署应用..."
-    kubectl apply -k . -n "$NAMESPACE"
+    # 使用 Kustomize 部署开发环境应用
+    print_info "使用 Kustomize 部署开发环境应用..."
+    kubectl apply -k overlays/dev -n "$NAMESPACE"
 
     print_success "应用部署完成"
 }

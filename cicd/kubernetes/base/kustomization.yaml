@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: ticket-management-base
+  annotations:
+    config.kubernetes.io/local-config: "true"
+
+resources:
+  - namespace.yaml
+  - backend/
+  - frontend/
+  # ingress将移到overlays中，因为不同环境可能不同

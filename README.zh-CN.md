@@ -103,6 +103,7 @@ pnpm install && pnpm dev
 - [**基础设施部署**](docs/INFRASTRUCTURE.md) - Terraform + EKS 完整部署指南
 - [**CI/CD流程**](docs/CICD.md) - GitHub Actions + ArgoCD + Image Updater
 - [**自动化脚本**](docs/SCRIPTS.md) - 部署和管理脚本使用指南
+- [**CI/CD结构**](cicd/README.md) - 完整的CI/CD目录结构指南
 
 ### 📋 其他文档
 - [**项目说明**](docs/INSTRUCTION.md) - 项目背景和架构
@@ -120,11 +121,16 @@ play-cicd001/
 ├── frontend/                  # Vue 3前端应用
 ├── cicd/                      # CI/CD配置文件
 │   ├── docker/               # Docker构建配置
-│   ├── k8s/                  # Kubernetes部署文件
-│   │   ├── backend/          # 后端K8s配置
-│   │   ├── frontend/         # 前端K8s配置
-│   │   └── argocd/           # ArgoCD配置
-│   └── argocd/               # ArgoCD应用配置
+│   ├── kubernetes/           # Kubernetes manifests (Kustomize)
+│   │   ├── base/             # 基础配置
+│   │   ├── overlays/         # 环境特定配置
+│   │   │   ├── dev/          # 开发环境
+│   │   │   └── prod/         # 生产环境
+│   │   └── tools/            # K8s工具配置
+│   ├── argocd/               # ArgoCD GitOps配置
+│   │   ├── apps/             # ArgoCD应用定义
+│   │   └── project.yaml      # ArgoCD项目配置
+│   └── github_action/        # GitHub Actions脚本
 ├── infra/                     # Terraform基础设施
 │   ├── modules/              # Terraform模块
 │   │   ├── vpc/              # VPC网络配置
@@ -146,7 +152,8 @@ play-cicd001/
 │   ├── INSTRUCTION.md        # 项目背景架构
 │   └── plan.md               # 开发里程碑
 ├── records.txt                # 部署记录
-└── CLAUDE.md                  # Claude Code配置
+├── CLAUDE.md                  # Claude Code配置
+└── cicd/README.md             # CI/CD目录结构指南
 ```
 
 ### 🔧 常用命令
@@ -188,7 +195,7 @@ kubectl get pods -n argocd -l app.kubernetes.io/name=argocd-image-updater  # 检
 
 # 🔐 ECR凭据管理 (ArgoCD Image Updater)
 ./scripts/setup-ecr-credentials.sh               # 生成ECR credentials
-kubectl apply -k cicd/k8s/argocd/               # 部署ECR凭据到ArgoCD
+kubectl apply -k cicd/kubernetes/tools/argocd/   # 部署ECR凭据到ArgoCD
 
 # 🐳 本地开发
 cd backend && mvn spring-boot:run                 # 启动后端 (端口: 8080)
