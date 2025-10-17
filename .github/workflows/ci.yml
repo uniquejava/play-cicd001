@@ -136,6 +136,7 @@ jobs:
         load: false
         tags: |
           ticket-management-backend:${{ env.IMAGE_TAG }}
+          ticket-management-backend:latest
           ${{ steps.login-ecr.outputs.registry != '' && format('{0}/ticket-management-backend:{1}', steps.login-ecr.outputs.registry, env.IMAGE_TAG) || '' }}
       continue-on-error: true
 
@@ -150,6 +151,7 @@ jobs:
         load: false
         tags: |
           ticket-management-frontend:${{ env.IMAGE_TAG }}
+          ticket-management-frontend:latest
           ${{ steps.login-ecr.outputs.registry != '' && format('{0}/ticket-management-frontend:{1}', steps.login-ecr.outputs.registry, env.IMAGE_TAG) || '' }}
       continue-on-error: true
 

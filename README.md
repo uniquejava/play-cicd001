@@ -4,10 +4,11 @@
 
 A modern ticket management system based on Spring Boot + Vue 3, demonstrating complete DevOps and CI/CD workflows.
 
-[![CI Pipeline](https://github.com/uniquejava/play-cicd001/actions/workflows/ci.yml/badge.svg)](https://github.com/uniquejava/play-cicd001/actions/workflows/ci.yml)
-[![CD to Development](https://github.com/uniquejava/play-cicd001/actions/workflows/cd-dev.yml/badge.svg)](https://github.com/uniquejava/play-cicd001/actions/workflows/cd-dev.yml)
+**Development:**
+[![Dev CI](https://github.com/uniquejava/play-cicd001/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/uniquejava/play-cicd001/actions/workflows/ci.yml)
 
-[![CD to Production](https://github.com/uniquejava/play-cicd001/actions/workflows/cd-prod.yml/badge.svg)](https://github.com/uniquejava/play-cicd001/actions/workflows/cd-prod.yml)
+**Production:**
+[![Prod CI](https://github.com/uniquejava/play-cicd001/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/uniquejava/play-cicd001/actions/workflows/ci.yml)
 
 
 ![screenshot](./docs/screenshot.jpg)
