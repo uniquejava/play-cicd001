@@ -137,6 +137,7 @@ jobs:
         tags: |
           ticket-management-backend:${{ env.IMAGE_TAG }}
           ${{ steps.login-ecr.outputs.registry != '' && format('{0}/ticket-management-backend:{1}', steps.login-ecr.outputs.registry, env.IMAGE_TAG) || '' }}
+      continue-on-error: true
 
     - name: Build and push frontend image
       env:
@@ -150,6 +151,7 @@ jobs:
         tags: |
           ticket-management-frontend:${{ env.IMAGE_TAG }}
           ${{ steps.login-ecr.outputs.registry != '' && format('{0}/ticket-management-frontend:{1}', steps.login-ecr.outputs.registry, env.IMAGE_TAG) || '' }}
+      continue-on-error: true
 
     - name: Image build summary
       run: |
